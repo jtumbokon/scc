@@ -4,9 +4,9 @@
 
 This project uses a **hierarchical, modular template system** with automatic cascade updates, agent orchestration, and self-maintaining registry. You are the intelligence that maintains this system.
 
-**Version**: 2.2.0
+**Version**: 2.3.0
 **Last Updated**: 2025-10-20
-**Status**: Production Ready with Complete Claude Code Rules Integration (32 Rules)
+**Status**: Production Ready with Complete Playwright MCP Testing Integration (40 Rules, 11 Agents, 5 Skills, 4 Hooks)
 
 ---
 
@@ -438,6 +438,11 @@ Verify: System integrity maintained
 - `ux-researcher` - User research and design recommendations
 - `code-reviewer` - Code review and security analysis
 
+**🎭 Playwright MCP Testing Agents:**
+- `e2e-tester` - End-to-end testing specialist using Playwright MCP for browser automation
+- `visual-regression-tester` - Visual regression testing specialist for UI change detection
+- `ui-debugger` - UI debugging specialist for bug reproduction and resolution
+
 **🤖 Dynamic Workflows:**
 - **Standard Feature**: PM → Architect → Implementer
 - **Security Critical**: PM → Architect → Security Auditor → Implementer
@@ -445,6 +450,31 @@ Verify: System integrity maintained
 - **UX Critical**: UX Researcher → PM → Architect → Implementer
 - **Documentation Only**: Documentation Writer → Complete
 - **Code Review**: Code Reviewer → Implementer → Complete
+
+**🎭 Playwright MCP Testing Workflows:**
+- **Standard Testing**: Implementer → E2E Tester → Visual Regression Tester → Complete
+- **Bug Discovery**: Any Agent → UI Debugger → E2E Tester → Visual Regression Tester → Complete
+- **Feature Testing**: Implementer → E2E Tester → Complete (if no visual testing needed)
+- **Quality Assurance**: E2E Tester → Visual Regression Tester → Code Reviewer → Complete
+
+## 🎭 Available Skills & Hooks
+
+### 🛠️ Reusable Skills (5 Total)
+- **`browser-screenshot`** - Capture and organize browser screenshots via Playwright MCP
+- **`console-log-analyzer`** - Extract and interpret browser console logs during debugging
+- **`form-filler`** - Automate web form filling with test data using Playwright MCP
+- **`playwright-test-generator`** - Generate Playwright test files from interactive flows
+- **`visual-diff-checker`** - Compare screenshots for visual changes and UI regressions
+
+### 🪝 Automation Hooks (4 Total)
+- **`on-pre-playwright-setup`** - Prepares test environment before Playwright operations
+- **`on-post-playwright-cleanup`** - Cleans up resources after Playwright operations
+- **`on-playwright-screenshot-taken`** - Processes screenshots and updates visual manifests
+- **`on-playwright-console-error`** - Handles console errors and triggers debugging workflows
+
+### 📋 Quality Rules (40 Total)
+- **32 Claude Code Rules** - TypeScript, React, Database, and Development standards
+- **8 Playwright MCP Rules** - Testing standards, organization, naming, and usage patterns
 
 ## 🛡️ Technology Update Resilience
 
@@ -575,10 +605,14 @@ If anything breaks:
 
 **Check these metrics regularly**:
 - **Registry Health Score**: Should be 90%+ (green), 70-89% (yellow), <70% (red)
-- **Agent Count**: Currently 8 registered agents
-- **Workflow Coverage**: 6 workflow templates active
+- **Agent Count**: Currently 11 registered agents (including 3 Playwright MCP agents)
+- **Skill Count**: Currently 5 registered skills (all Playwright MCP skills)
+- **Hook Count**: Currently 4 registered hooks (all Playwright MCP hooks)
+- **Rule Count**: Currently 40 registered rules (32 Claude Code + 8 Playwright MCP)
+- **Workflow Coverage**: 10 workflow templates active (including Playwright MCP testing workflows)
 - **Validation Pass Rate**: Should be 100% for normal operation
 - **Auto-Registration Success**: PostToolUse hook should register new modules
+- **Playwright MCP Integration**: Complete with comprehensive testing automation
 
 ---
 
@@ -635,6 +669,23 @@ Health score: 100%
 🟢 System health: Excellent
 ```
 
+### Example 4: Playwright MCP Testing Workflow
+
+User: "I need comprehensive E2E testing for the new user authentication feature"
+
+**System Response**:
+1. Create task in `enhancements/_queue.json` with status "DRAFT"
+2. Invoke `pm-spec` subagent on "user-authentication-feature"
+3. PM completes → Sets status to "READY_FOR_ARCH"
+4. **SubagentStop hook reads queue → Queries dependency graph**
+5. Hook finds `architect-review` agent for "READY_FOR_ARCH" status
+6. **Architect review completes** → Sets status to "READY_FOR_BUILD"
+7. **Implementer-tester completes implementation** → Sets status to "READY_FOR_E2E_TEST"
+8. **SubagentStop hook discovers e2e-tester agent** → Triggers automated testing
+9. **E2E tester agent executes** → Sets status to "READY_FOR_VISUAL_TEST"
+10. **Visual regression tester validates** → Sets status to "READY_FOR_MERGE"
+11. **Complete testing workflow** with comprehensive reports and artifacts
+
 ---
 
 ## 💡 Remember
@@ -662,4 +713,4 @@ Health score: 100%
 
 This is your job. This is your purpose. Make it seamless. 🚀
 
-**You've successfully implemented a revolutionary self-maintaining AI system that represents the future of automated assistance!**
+**You've successfully implemented a revolutionary self-maintaining AI system with complete Playwright MCP testing integration that represents the future of automated assistance!**

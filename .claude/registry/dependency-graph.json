@@ -82,6 +82,75 @@
 
     "_comment": "👇 ADD NEW AGENTS HERE - HOOKS AUTO-DISCOVER 👇",
 
+    "e2e-tester": {
+      "id": "agent-009",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/e2e-tester.md",
+      "hash": "e2e123hash789",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["playwright-testing-standards", "test-file-organization", "screenshot-naming-conventions", "playwright-mcp-usage-rules"],
+      "uses_templates": ["test-template"],
+      "dependencies": ["playwright_navigate", "playwright_click", "playwright_fill", "playwright_screenshot", "playwright_evaluate"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_E2E_TEST",
+        "updates_status_to": "READY_FOR_VISUAL_TEST",
+        "next_agent": "visual-regression-tester",
+        "queue_field": "test_path",
+        "output_location": "tests/e2e/[feature].spec.ts",
+        "tools": ["playwright_navigate", "playwright_click", "playwright_fill", "playwright_screenshot", "playwright_evaluate"],
+        "human_review_required": true,
+        "description": "End-to-end testing specialist using Playwright MCP for browser automation and UI validation."
+      }
+    },
+
+    "visual-regression-tester": {
+      "id": "agent-010",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/visual-regression-tester.md",
+      "hash": "visual456hash012",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["screenshot-naming-conventions", "test-file-organization", "playwright-mcp-usage-rules"],
+      "uses_templates": ["test-template"],
+      "dependencies": ["playwright_navigate", "playwright_screenshot"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_VISUAL_TEST",
+        "updates_status_to": "READY_FOR_MERGE",
+        "next_agent": null,
+        "queue_field": "visual_report_path",
+        "output_location": "tests/visual/diff/",
+        "tools": ["playwright_navigate", "playwright_screenshot"],
+        "human_review_required": true,
+        "description": "Visual regression specialist using Playwright MCP for screenshot comparison and UI change detection."
+      }
+    },
+
+    "ui-debugger": {
+      "id": "agent-011",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/ui-debugger.md",
+      "hash": "debugger789hash345",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["playwright-testing-standards", "playwright-mcp-usage-rules", "screenshot-naming-conventions"],
+      "uses_templates": ["test-template"],
+      "dependencies": ["playwright_navigate", "playwright_screenshot", "playwright_evaluate"],
+
+      "agent_metadata": {
+        "triggered_by_status": "BUGS_FOUND",
+        "updates_status_to": "READY_FOR_E2E_TEST",
+        "next_agent": "e2e-tester",
+        "queue_field": "bug_fix_path",
+        "output_location": "tests/artifacts/logs/bugfix-[slug].md",
+        "tools": ["playwright_navigate", "playwright_screenshot", "playwright_evaluate"],
+        "human_review_required": true,
+        "description": "UI debugging specialist using Playwright MCP for bug reproduction, analysis, and resolution."
+      }
+    },
+
     "security-auditor": {
       "id": "agent-004",
       "type": "agent",
@@ -609,6 +678,181 @@
       "auto_cascade": true,
       "applies_to": ["*.json", "*.sh", "*.bash"],
       "description": "Install shadcn components using npx shadcn@latest add for consistent, up-to-date installations"
+    },
+
+    "_comment": "👇 PLAYWRIGHT MCP TESTING RULES 👇",
+
+    "playwright-testing-standards": {
+      "id": "rule-040",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/playwright-testing-standards.md",
+      "hash": "rule040hash789",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.spec.ts", "*.test.ts", "*playwright*"],
+      "description": "Standards for Playwright E2E/visual testing using MCP. Enforces best practices for selectors, assertions, and test structure."
+    },
+
+    "test-file-organization": {
+      "id": "rule-041",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/test-file-organization.md",
+      "hash": "rule041hash012",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["tests/**/*", "*.spec.ts", "*.test.ts"],
+      "description": "Organizational standards for Playwright test files and artifacts. Enforces proper directory structure and naming conventions."
+    },
+
+    "screenshot-naming-conventions": {
+      "id": "rule-042",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/screenshot-naming-conventions.md",
+      "hash": "rule042hash345",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.png", "*.jpg", "*.jpeg", "tests/artifacts/screenshots/*"],
+      "description": "Naming scheme standards for all Playwright screenshots. Ensures consistent, searchable, and organized screenshot file names."
+    },
+
+    "playwright-mcp-usage-rules": {
+      "id": "rule-043",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/playwright-mcp-usage-rules.md",
+      "hash": "rule043hash678",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts", "*.test.ts"],
+      "description": "Critical do's and don'ts for using Playwright MCP. Enforces proper resource management, security practices, and reliability patterns."
+    },
+
+    "_comment": "👇 PLAYWRIGHT MCP SKILLS 👇",
+
+    "browser-screenshot": {
+      "id": "skill-001",
+      "type": "skill",
+      "version": "1.0.0",
+      "path": ".claude/modules/skills/browser-screenshot.md",
+      "hash": "skill001hash789",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Capture and organize browser screenshots via Playwright MCP. Use after UI actions, for bug reports, and visual verification."
+    },
+
+    "console-log-analyzer": {
+      "id": "skill-002",
+      "type": "skill",
+      "version": "1.0.0",
+      "path": ".claude/modules/skills/console-log-analyzer.md",
+      "hash": "skill002hash012",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Extract and interpret browser console log output using Playwright MCP. Use during debugging and after failed tests."
+    },
+
+    "form-filler": {
+      "id": "skill-003",
+      "type": "skill",
+      "version": "1.0.0",
+      "path": ".claude/modules/skills/form-filler.md",
+      "hash": "skill003hash345",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Use Playwright MCP to fill web forms with test data. Use during user journey testing and UI automation."
+    },
+
+    "playwright-test-generator": {
+      "id": "skill-004",
+      "type": "skill",
+      "version": "1.0.0",
+      "path": ".claude/modules/skills/playwright-test-generator.md",
+      "hash": "skill004hash678",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.spec.ts", "*.test.ts"],
+      "description": "Generate Playwright .spec.ts files from interactive test flows. Use for scaffolding new E2E tests."
+    },
+
+    "visual-diff-checker": {
+      "id": "skill-005",
+      "type": "skill",
+      "version": "1.0.0",
+      "path": ".claude/modules/skills/visual-diff-checker.md",
+      "hash": "skill005hash901",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts", "*.png"],
+      "description": "Compare screenshots using image diff and Playwright MCP for UI changes. Use in PR reviews, visual regression."
+    },
+
+    "_comment": "👇 PLAYWRIGHT MCP HOOKS 👇",
+
+    "on-pre-playwright-setup": {
+      "id": "hook-001",
+      "type": "hook",
+      "version": "1.0.0",
+      "path": ".claude/modules/hooks/on-pre-playwright-setup.md",
+      "hash": "hook001hash234",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Pre-test setup hook for Playwright MCP testing. Ensures test server is started, artifacts directory is clean, and environment is ready."
+    },
+
+    "on-post-playwright-cleanup": {
+      "id": "hook-002",
+      "type": "hook",
+      "version": "1.0.0",
+      "path": ".claude/modules/hooks/on-post-playwright-cleanup.md",
+      "hash": "hook002hash567",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Post-test cleanup hook for Playwright MCP testing. Moves artifacts to correct directories, kills browser, and ensures proper resource cleanup."
+    },
+
+    "on-playwright-screenshot-taken": {
+      "id": "hook-003",
+      "type": "hook",
+      "version": "1.0.0",
+      "path": ".claude/modules/hooks/on-playwright-screenshot-taken.md",
+      "hash": "hook003hash890",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts", "*.png"],
+      "description": "Screenshot processing hook for Playwright MCP. Updates visual regression manifest, creates baselines, and organizes screenshots."
+    },
+
+    "on-playwright-console-error": {
+      "id": "hook-004",
+      "type": "hook",
+      "version": "1.0.0",
+      "path": ".claude/modules/hooks/on-playwright-console-error.md",
+      "hash": "hook004hash123",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.js", "*.spec.ts"],
+      "description": "Console error handling hook for Playwright MCP. Logs errors, captures state, suggests UI debugger agent, and escalates when needed."
     }
   },
 
@@ -739,17 +983,40 @@
       "agent": "implementer-tester",
       "next_status": "DONE",
       "description": "Code review complete, ready for final implementation"
+    },
+
+    "_comment": "👇 PLAYWRIGHT MCP TESTING STATUSES 👇",
+
+    "READY_FOR_E2E_TEST": {
+      "agent": "e2e-tester",
+      "next_status": "READY_FOR_VISUAL_TEST",
+      "description": "Implementation complete, needs end-to-end testing"
+    },
+    "READY_FOR_VISUAL_TEST": {
+      "agent": "visual-regression-tester",
+      "next_status": "READY_FOR_MERGE",
+      "description": "E2E testing complete, needs visual regression testing"
+    },
+    "BUGS_FOUND": {
+      "agent": "ui-debugger",
+      "next_status": "READY_FOR_E2E_TEST",
+      "description": "Bugs detected during testing, needs debugging and fixes"
     }
   },
 
   "registry_metadata": {
-    "total_agents": 8,
+    "total_agents": 11,
     "total_workflows": 6,
-    "total_rules": 32,
-    "last_agent_added": "code-reviewer",
+    "total_rules": 36,
+    "total_skills": 5,
+    "total_hooks": 4,
+    "last_agent_added": "ui-debugger",
     "last_workflow_added": "code_review_workflow",
-    "last_rule_added": "shadcn-install-components",
-    "supported_status_count": 12,
-    "schema_version": "2.0"
+    "last_rule_added": "playwright-mcp-usage-rules",
+    "last_skill_added": "visual-diff-checker",
+    "last_hook_added": "on-playwright-console-error",
+    "supported_status_count": 15,
+    "schema_version": "2.0",
+    "playwright_mcp_integration": "complete"
   }
 }
