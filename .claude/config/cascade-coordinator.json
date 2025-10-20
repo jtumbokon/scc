@@ -1,0 +1,304 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Unified Cascade Engine - Ensures atomic all-or-none updates across all critical system files",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "cascade_coordinator": {
+    "enabled": true,
+    "atomic_updates": true,
+    "validation_required": true,
+    "rollback_on_failure": true,
+
+    "critical_files": {
+      "primary": [
+        {
+          "file": "registry/dependency-graph.json",
+          "priority": 1,
+          "auto_update": true,
+          "validation": "schema_and_consistency"
+        },
+        {
+          "file": "CLAUDE.md",
+          "priority": 1,
+          "auto_update": true,
+          "validation": "content_and_structure"
+        },
+        {
+          "file": "version.json",
+          "priority": 1,
+          "auto_update": true,
+          "validation": "version_consistency"
+        },
+        {
+          "file": "README.md",
+          "priority": 2,
+          "auto_update": true,
+          "validation": "statistics_consistency"
+        }
+      ],
+      "secondary": [
+        {
+          "file": "registry/cascade-update-log.json",
+          "priority": 3,
+          "auto_update": true,
+          "validation": "log_completeness"
+        },
+        {
+          "file": "registry/update-log.json",
+          "priority": 3,
+          "auto_update": true,
+          "validation": "log_consistency"
+        },
+        {
+          "file": "SYSTEM-NOTIFICATION.md",
+          "priority": 4,
+          "auto_update": true,
+          "validation": "notification_completeness"
+        }
+      ]
+    },
+
+    "update_strategy": {
+      "type": "atomic_all_or_none",
+      "transaction_timeout": 300,
+      "max_retry_attempts": 3,
+      "retry_delay": 5,
+      "failure_action": "rollback_and_block"
+    },
+
+    "triggers": {
+      "module_creation": {
+        "enabled": true,
+        "cascade_depth": "full",
+        "update_secondary_files": true
+      },
+      "module_update": {
+        "enabled": true,
+        "cascade_depth": "calculated",
+        "update_secondary_files": true
+      },
+      "system_version_change": {
+        "enabled": true,
+        "cascade_depth": "full",
+        "update_secondary_files": true,
+        "force_readme_update": true
+      },
+      "bulk_operations": {
+        "enabled": true,
+        "cascade_depth": "full",
+        "update_secondary_files": true,
+        "batch_processing": true
+      }
+    },
+
+    "validation_gates": {
+      "pre_cascade": [
+        {
+          "name": "system_health_check",
+          "required": true,
+          "failure_action": "block_operation"
+        },
+        {
+          "name": "dependency_integrity_check",
+          "required": true,
+          "failure_action": "block_operation"
+        },
+        {
+          "name": "file_accessibility_check",
+          "required": true,
+          "failure_action": "block_operation"
+        },
+        {
+          "name": "version_compatibility_check",
+          "required": true,
+          "failure_action": "block_operation"
+        }
+      ],
+
+      "post_cascade": [
+        {
+          "name": "cross_file_consistency_check",
+          "required": true,
+          "failure_action": "rollback_and_alert"
+        },
+        {
+          "name": "registry_integrity_validation",
+          "required": true,
+          "failure_action": "rollback_and_alert"
+        },
+        {
+          "name": "documentation_synchronization_check",
+          "required": true,
+          "failure_action": "rollback_and_alert"
+        },
+        {
+          "name": "system_health_post_update",
+          "required": true,
+          "failure_action": "rollback_and_alert"
+        }
+      ]
+    },
+
+    "atomic_transactions": {
+      "transaction_log": "registry/.cascade-transaction.log",
+      "backup_directory": "registry/.cascade-backups",
+      "checkpoint_frequency": "per_file",
+      "rollback_strategy": "restore_from_backup",
+
+      "transaction_stages": [
+        {
+          "stage": "pre_validation",
+          "description": "Validate system state before changes",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "create_backup",
+          "description": "Create backup of all critical files",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "update_dependency_graph",
+          "description": "Update primary dependency tracking",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "update_system_documentation",
+          "description": "Update CLAUDE.md and version.json",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "update_project_documentation",
+          "description": "Update README.md and secondary files",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "update_logs",
+          "description": "Update all log files",
+          "checkpoint": true,
+          "rollback_point": true
+        },
+        {
+          "stage": "post_validation",
+          "description": "Validate consistency after all updates",
+          "checkpoint": true,
+          "rollback_point": false
+        },
+        {
+          "stage": "commit_changes",
+          "description": "Finalize transaction and clean up",
+          "checkpoint": false,
+          "rollback_point": false
+        }
+      ]
+    },
+
+    "auto_generation": {
+      "enabled": true,
+      "generate_from_source": "dependency-graph.json",
+
+      "files": {
+        "CLAUDE.md": {
+          "auto_generate": true,
+          "sections": [
+            "rules_list",
+            "module_statistics",
+            "system_version",
+            "active_capabilities"
+          ],
+          "template_path": "templates/CLAUDE.template.md"
+        },
+
+        "README.md": {
+          "auto_generate": true,
+          "sections": [
+            "system_statistics",
+            "module_counts",
+            "version_badge",
+            "health_metrics"
+          ],
+          "template_path": "templates/README.template.md"
+        },
+
+        "version.json": {
+          "auto_generate": true,
+          "fields": [
+            "system_version",
+            "last_updated",
+            "module_counts",
+            "integration_status"
+          ]
+        }
+      }
+    },
+
+    "consistency_validation": {
+      "enabled": true,
+      "validation_interval": "post_cascade",
+      "auto_fix": true,
+
+      "checks": {
+        "version_consistency": {
+          "description": "Ensure version numbers match across all files",
+          "files": ["version.json", "CLAUDE.md", "README.md"],
+          "tolerance": "exact_match",
+          "auto_fix": true
+        },
+
+        "rule_count_consistency": {
+          "description": "Ensure rule counts match across documentation",
+          "files": ["dependency-graph.json", "CLAUDE.md", "README.md"],
+          "tolerance": "exact_match",
+          "auto_fix": true
+        },
+
+        "module_list_consistency": {
+          "description": "Ensure module lists are synchronized",
+          "files": ["dependency-graph.json", "CLAUDE.md"],
+          "tolerance": "exact_match",
+          "auto_fix": true
+        },
+
+        "timestamp_consistency": {
+          "description": "Ensure timestamps are logical and consistent",
+          "files": ["version.json", "update-log.json", "cascade-update-log.json"],
+          "tolerance": "chronological",
+          "auto_fix": true
+        }
+      }
+    },
+
+    "monitoring": {
+      "enabled": true,
+      "metrics": [
+        "cascade_success_rate",
+        "transaction_duration",
+        "rollback_frequency",
+        "validation_failure_rate",
+        "consistency_score"
+      ],
+
+      "alerts": {
+        "cascade_failure": {
+          "enabled": true,
+          "threshold": 1,
+          "action": "immediate_notification"
+        },
+        "consistency_score_drop": {
+          "enabled": true,
+          "threshold": 95,
+          "action": "auto_validation_trigger"
+        },
+        "rollback_frequency_high": {
+          "enabled": true,
+          "threshold": 0.1,
+          "action": "system_health_check"
+        }
+      }
+    }
+  }
+}

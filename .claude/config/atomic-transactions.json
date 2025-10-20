@@ -1,0 +1,440 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Atomic Transaction System - Ensures all-or-none updates across all critical system files",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "atomic_transaction_manager": {
+    "enabled": true,
+    "transaction_timeout": 300,
+    "max_retry_attempts": 3,
+    "retry_delay": 5,
+    "rollback_on_failure": true,
+    "require_confirmation": false,
+
+    "transaction_log": {
+      "log_file": "registry/.atomic-transactions.log",
+      "backup_directory": "registry/.transaction-backups",
+      "max_log_size": "100MB",
+      "log_retention_days": 90
+    },
+
+    "transaction_states": {
+      "pending": "Transaction initialized, waiting for resources",
+      "preparing": "Creating backups and preparing updates",
+      "prepared": "Backups created, ready to execute",
+      "committing": "Executing atomic updates",
+      "committed": "All updates completed successfully",
+      "rolling_back": "Failure detected, initiating rollback",
+      "rolled_back": "Transaction rolled back successfully",
+      "failed": "Transaction failed and rollback incomplete"
+    },
+
+    "transaction_types": {
+      "module_creation": {
+        "description": "Create new module with full cascade",
+        "critical_files": [
+          "registry/dependency-graph.json",
+          "CLAUDE.md",
+          "README.md",
+          "registry/update-log.json",
+          "registry/cascade-update-log.json"
+        ],
+        "backup_required": true,
+        "validation_required": true,
+        "rollback_strategy": "restore_from_backup"
+      },
+      "module_update": {
+        "description": "Update existing module with cascade",
+        "critical_files": [
+          "registry/dependency-graph.json",
+          "CLAUDE.md",
+          "version.json",
+          "registry/update-log.json"
+        ],
+        "backup_required": true,
+        "validation_required": true,
+        "rollback_strategy": "restore_from_backup"
+      },
+      "bulk_module_operations": {
+        "description": "Bulk operations on multiple modules",
+        "critical_files": [
+          "registry/dependency-graph.json",
+          "CLAUDE.md",
+          "version.json",
+          "README.md",
+          "registry/update-log.json",
+          "registry/cascade-update-log.json",
+          "SYSTEM-NOTIFICATION.md"
+        ],
+        "backup_required": true,
+        "validation_required": true,
+        "rollback_strategy": "restore_from_backup"
+      },
+      "system_version_change": {
+        "description": "System version update with full synchronization",
+        "critical_files": [
+          "CLAUDE.md",
+          "version.json",
+          "README.md",
+          "registry/dependency-graph.json",
+          "registry/update-log.json",
+          "registry/cascade-update-log.json",
+          "SYSTEM-NOTIFICATION.md"
+        ],
+        "backup_required": true,
+        "validation_required": true,
+        "rollback_strategy": "restore_from_backup"
+      }
+    },
+
+    "atomic_operations": {
+      "pre_transaction": {
+        "validation_stage": {
+          "name": "pre_transaction_validation",
+          "description": "Validate system state before transaction",
+          "operations": [
+            {
+              "name": "system_health_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "abort_transaction"
+            },
+            {
+              "name": "file_accessibility_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "abort_transaction"
+            },
+            {
+              "name": "dependency_integrity_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "abort_transaction"
+            },
+            {
+              "name": "version_compatibility_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "abort_transaction"
+            }
+          ]
+        },
+        "backup_stage": {
+          "name": "create_transaction_backup",
+          "description": "Create backup of all critical files",
+          "operations": [
+            {
+              "name": "identify_critical_files",
+              "type": "discovery",
+              "critical": true
+            },
+            {
+              "name": "create_backup_directory",
+              "type": "filesystem",
+              "critical": true
+            },
+            {
+              "name": "backup_files",
+              "type": "filesystem",
+              "critical": true,
+              "backup_method": "copy_with_timestamp"
+            },
+            {
+              "name": "verify_backup_integrity",
+              "type": "validation",
+              "critical": true
+            }
+          ]
+        }
+      },
+
+      "transaction_execution": {
+        "update_stages": [
+          {
+            "stage": "dependency_graph_update",
+            "description": "Update dependency graph first",
+            "files": ["registry/dependency-graph.json"],
+            "validation": "schema_and_content_validation",
+            "rollback_point": true
+          },
+          {
+            "stage": "system_documentation_update",
+            "description": "Update CLAUDE.md and version.json",
+            "files": ["CLAUDE.md", "version.json"],
+            "validation": "content_consistency_validation",
+            "rollback_point": true
+          },
+          {
+            "stage": "project_documentation_update",
+            "description": "Update README.md and related files",
+            "files": ["README.md"],
+            "validation": "statistics_consistency_validation",
+            "rollback_point": true
+          },
+          {
+            "stage": "log_files_update",
+            "description": "Update all tracking and log files",
+            "files": ["registry/update-log.json", "registry/cascade-update-log.json"],
+            "validation": "log_integrity_validation",
+            "rollback_point": true
+          },
+          {
+            "stage": "notification_update",
+            "description": "Update system notifications",
+            "files": ["SYSTEM-NOTIFICATION.md"],
+            "validation": "notification_completeness_validation",
+            "rollback_point": true
+          }
+        ]
+      },
+
+      "post_transaction": {
+        "validation_stage": {
+          "name": "post_transaction_validation",
+          "description": "Validate system state after transaction",
+          "operations": [
+            {
+              "name": "cross_file_consistency_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "rollback_if_possible"
+            },
+            {
+              "name": "registry_integrity_validation",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "rollback_if_possible"
+            },
+            {
+              "name": "documentation_synchronization_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "auto_fix_if_possible"
+            },
+            {
+              "name": "system_health_final_check",
+              "type": "validation",
+              "critical": true,
+              "failure_action": "alert_and_monitor"
+            }
+          ]
+        },
+        "cleanup_stage": {
+          "name": "transaction_cleanup",
+          "description": "Clean up temporary files and finalize transaction",
+          "operations": [
+            {
+              "name": "cleanup_temporary_files",
+              "type": "filesystem",
+              "critical": false
+            },
+            {
+              "name": "update_transaction_log",
+              "type": "logging",
+              "critical": true
+            },
+            {
+              "name": "generate_success_report",
+              "type": "reporting",
+              "critical": false
+            }
+          ]
+        }
+      },
+
+      "rollback_operations": {
+        "rollback_stages": [
+          {
+            "stage": "initiate_rollback",
+            "description": "Initiate rollback process",
+            "trigger": "transaction_failure",
+            "operations": [
+              {
+                "name": "identify_rollback_point",
+                "type": "discovery",
+                "critical": true
+              },
+              {
+                "name": "validate_backup_integrity",
+                "type": "validation",
+                "critical": true
+              }
+            ]
+          },
+          {
+            "stage": "restore_files",
+            "description": "Restore files from backup",
+            "operations": [
+              {
+                "name": "restore_critical_files",
+                "type": "filesystem",
+                "critical": true,
+                "restore_method": "copy_from_backup"
+              },
+              {
+                "name": "verify_restored_files",
+                "type": "validation",
+                "critical": true
+              }
+            ]
+          },
+          {
+            "stage": "post_rollback_validation",
+            "description": "Validate system after rollback",
+            "operations": [
+              {
+                "name": "system_integrity_check",
+                "type": "validation",
+                "critical": true
+              },
+              {
+                "name": "generate_rollback_report",
+                "type": "reporting",
+                "critical": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+
+    "consistency_guarantees": {
+      "atomicity": {
+        "description": "All-or-none update guarantee",
+        "implementation": "rollback_on_failure",
+        "verification": "post_transaction_validation"
+      },
+      "consistency": {
+        "description": "System remains in consistent state",
+        "implementation": "pre_and_post_validation",
+        "verification": "cross_file_consistency_check"
+      },
+      "isolation": {
+        "description": "Transactions do not interfere with each other",
+        "implementation": "transaction_locking",
+        "verification": "concurrent_operation_safety"
+      },
+      "durability": {
+        "description": "Committed transactions persist",
+        "implementation": "backup_and_logging",
+        "verification": "recovery_testing"
+      }
+    },
+
+    "error_handling": {
+      "pre_transaction_errors": {
+        "system_unhealthy": {
+          "action": "abort_transaction",
+          "retry_possible": false,
+          "user_notification": "System health check failed. Transaction aborted."
+        },
+        "file_access_denied": {
+          "action": "abort_transaction",
+          "retry_possible": true,
+          "user_notification": "File access denied. Check permissions and retry."
+        },
+        "dependency_corruption": {
+          "action": "abort_transaction",
+          "retry_possible": false,
+          "user_notification": "Dependency graph corrupted. Manual intervention required."
+        }
+      },
+      "execution_errors": {
+        "file_update_failure": {
+          "action": "rollback_transaction",
+          "retry_possible": true,
+          "user_notification": "File update failed. Rolling back changes."
+        },
+        "validation_failure": {
+          "action": "rollback_transaction",
+          "retry_possible": false,
+          "user_notification": "Validation failed. Rolling back changes."
+        },
+        "timeout_exceeded": {
+          "action": "rollback_transaction",
+          "retry_possible": true,
+          "user_notification": "Transaction timeout. Rolling back changes."
+        }
+      },
+      "rollback_errors": {
+        "backup_corruption": {
+          "action": "manual_intervention_required",
+          "retry_possible": false,
+          "user_notification": "CRITICAL: Backup corrupted. Manual intervention required."
+        },
+        "rollback_failure": {
+          "action": "emergency_mode",
+          "retry_possible": false,
+          "user_notification": "CRITICAL: Rollback failed. System may be in inconsistent state."
+        }
+      }
+    },
+
+    "monitoring_and_metrics": {
+      "transaction_metrics": [
+        {
+          "name": "transaction_success_rate",
+          "description": "Percentage of successful transactions",
+          "target": "> 99%"
+        },
+        {
+          "name": "average_transaction_duration",
+          "description": "Average time to complete transactions",
+          "target": "< 30 seconds"
+        },
+        {
+          "name": "rollback_rate",
+          "description": "Percentage of transactions that roll back",
+          "target": "< 1%"
+        },
+        {
+          "name": "consistency_score",
+          "description": "System consistency score after transactions",
+          "target": "100%"
+        }
+      ],
+      "alerts": [
+        {
+          "name": "high_rollback_rate",
+          "condition": "rollback_rate > 5%",
+          "action": "system_health_check"
+        },
+        {
+          "name": "consistency_degradation",
+          "condition": "consistency_score < 100%",
+          "action": "immediate_investigation"
+        },
+        {
+          "name": "transaction_failure",
+          "condition": "any_transaction_failure",
+          "action": "detailed_logging_and_analysis"
+        }
+      ]
+    },
+
+    "testing_framework": {
+      "test_transactions": [
+        {
+          "name": "basic_atomicity_test",
+          "description": "Test basic all-or-none behavior",
+          "method": "simulate_failure_and_verify_rollback"
+        },
+        {
+          "name": "consistency_validation_test",
+          "description": "Test consistency guarantees",
+          "method": "modify_files_and_validate_consistency"
+        },
+        {
+          "name": "concurrent_transaction_test",
+          "description": "Test transaction isolation",
+          "method": "run_concurrent_transactions_and_verify_isolation"
+        },
+        {
+          "name": "recovery_test",
+          "description": "Test recovery from failures",
+          "method": "simulate_various_failures_and_test_recovery"
+        }
+      ]
+    }
+  }
+}

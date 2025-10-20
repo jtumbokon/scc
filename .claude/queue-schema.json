@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Enhancement Queue",
+  "description": "Schema for enhancement queue file used by agents and hooks",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["slug", "status", "created"],
+    "properties": {
+      "slug": {
+        "type": "string",
+        "description": "Unique identifier (kebab-case)",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "title": {
+        "type": "string",
+        "description": "Human-readable title"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "READY_FOR_ARCH",
+          "READY_FOR_BUILD",
+          "READY_FOR_REVIEW",
+          "NEEDS_REVIEW",
+          "BLOCKED",
+          "DONE"
+        ],
+        "description": "Current status in workflow"
+      },
+      "created": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO 8601 timestamp"
+      },
+      "updated": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Last update timestamp"
+      },
+      "assigned_agent": {
+        "type": "string",
+        "description": "Current agent working on this"
+      },
+      "spec_path": {
+        "type": "string",
+        "description": "Path to spec file"
+      },
+      "adr_path": {
+        "type": "string",
+        "description": "Path to ADR file"
+      },
+      "pr_url": {
+        "type": "string",
+        "format": "uri",
+        "description": "PR URL if created"
+      },
+      "notes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Free-form notes"
+      },
+      "priority": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10,
+        "description": "Priority level (1=low, 10=high)"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Tags for categorization"
+      },
+      "estimated_hours": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Estimated work hours"
+      },
+      "actual_hours": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Actual work hours spent"
+      }
+    }
+  }
+}

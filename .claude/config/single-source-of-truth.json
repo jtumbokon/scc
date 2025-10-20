@@ -1,0 +1,428 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Single Source of Truth Pattern - Makes dependency-graph.json the authoritative source for all system information",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "single_source_of_truth": {
+    "enabled": true,
+    "primary_source": "registry/dependency-graph.json",
+    "synchronization_mode": "authoritative_source",
+    "auto_generate_derived_files": true,
+    "validation_enabled": true,
+
+    "source_authority": {
+      "primary_source": {
+        "file": "registry/dependency-graph.json",
+        "description": "Authoritative source for all system information",
+        "contains": [
+          "module_definitions",
+          "dependency_relationships",
+          "version_information",
+          "system_metadata"
+        ]
+      },
+
+      "derived_sources": [
+        {
+          "file": "CLAUDE.md",
+          "derivation_method": "template_based_generation",
+          "sections": [
+            "system_version",
+            "active_modules",
+            "rules_list",
+            "module_statistics"
+          ],
+          "template": "templates/CLAUDE.template.md"
+        },
+        {
+          "file": "README.md",
+          "derivation_method": "template_based_generation",
+          "sections": [
+            "version_badge",
+            "system_statistics",
+            "module_distribution",
+            "health_metrics"
+          ],
+          "template": "templates/README.template.md"
+        },
+        {
+          "file": "version.json",
+          "derivation_method": "field_extraction",
+          "fields": [
+            "system.version",
+            "system.last_updated",
+            "components.modules.rules",
+            "system.claude_code_rules_integrated"
+          ]
+        },
+        {
+          "file": "registry/update-log.json",
+          "derivation_method": "log_aggregation",
+          "source": "dependency_graph_metadata"
+        },
+        {
+          "file": "registry/cascade-update-log.json",
+          "derivation_method": "status_synchronization",
+          "source": "dependency_graph_health"
+        }
+      ]
+    },
+
+    "extraction_rules": {
+      "version_information": {
+        "source_path": "_schema_version",
+        "target_mappings": [
+          {
+            "target_file": "version.json",
+            "target_path": "system.version",
+            "transformation": "direct_copy"
+          },
+          {
+            "target_file": "CLAUDE.md",
+            "target_pattern": "\\*\\*Version\\*\\*: [0-9]+\\.[0-9]+\\.[0-9]+",
+            "transformation": "regex_replace"
+          },
+          {
+            "target_file": "README.md",
+            "target_pattern": "version-[0-9]+\\.[0-9]+\\.[0-9]+",
+            "transformation": "regex_replace"
+          }
+        ]
+      },
+
+      "module_information": {
+        "rules_extraction": {
+          "source_path": "modules",
+          "filter_condition": "type == 'rule'",
+          "extraction_method": "filter_and_count",
+          "target_mappings": [
+            {
+              "target_file": "CLAUDE.md",
+              "target_section": "Claude Code Integration Rules",
+              "categorization_method": "by_rule_id_pattern",
+              "template": "templates/rules-list.template.md"
+            },
+            {
+              "target_file": "README.md",
+              "target_section": "Module Distribution",
+              "statistics_method": "count_by_type"
+            }
+          ]
+        },
+
+        "modules_by_type": {
+          "source_path": "modules",
+          "grouping_method": "type_based_grouping",
+          "target_mappings": [
+            {
+              "target_file": "CLAUDE.md",
+              "target_section": "Active Modules",
+              "template": "templates/modules-by-type.template.md"
+            },
+            {
+              "target_file": "README.md",
+              "target_section": "Module Types",
+              "format": "statistics_table"
+            }
+          ]
+        }
+      },
+
+      "dependency_information": {
+        "extraction_method": "graph_analysis",
+        "metrics": [
+          "total_modules",
+          "total_dependencies",
+          "dependency_depth",
+          "orphaned_modules",
+          "circular_dependencies"
+        ],
+        "target_mappings": [
+          {
+            "target_file": "CLAUDE.md",
+            "target_section": "System Architecture",
+            "format": "architectural_summary"
+          },
+          {
+            "target_file": "README.md",
+            "target_section": "System Status",
+            "format": "health_metrics"
+          }
+        ]
+      },
+
+      "health_information": {
+        "extraction_method": "registry_metadata_analysis",
+        "metrics": [
+          "registry_health_score",
+          "validation_pass_rate",
+          "last_validation_timestamp",
+          "system_status"
+        ],
+        "target_mappings": [
+          {
+            "target_file": "README.md",
+            "target_section": "Health Metrics",
+            "format": "health_summary"
+          },
+          {
+            "target_file": "CLAUDE.md",
+            "target_section": "System Status",
+            "format": "status_summary"
+          }
+        ]
+      }
+    },
+
+    "synchronization_triggers": {
+      "triggers": [
+        {
+          "name": "dependency_graph_change",
+          "condition": "file_modified",
+          "file": "registry/dependency-graph.json",
+          "action": "regenerate_all_derived_files",
+          "delay": 0
+        },
+        {
+          "name": "module_addition",
+          "condition": "modules_added",
+          "source": "dependency-graph.json",
+          "action": "update_module_lists_and_statistics",
+          "delay": 1
+        },
+        {
+          "name": "module_removal",
+          "condition": "modules_removed",
+          "source": "dependency-graph.json",
+          "action": "update_module_lists_and_statistics",
+          "delay": 1
+        },
+        {
+          "name": "version_change",
+          "condition": "schema_version_changed",
+          "source": "dependency-graph.json",
+          "action": "update_all_version_references",
+          "delay": 0
+        },
+        {
+          "name": "system_health_change",
+          "condition": "health_metrics_changed",
+          "source": "dependency-graph.json",
+          "action": "update_health_display",
+          "delay": 5
+        }
+      ]
+    },
+
+    "generation_templates": {
+      "claude_template": {
+        "file": "templates/CLAUDE.template.md",
+        "variables": [
+          "{{SYSTEM_VERSION}}",
+          "{{RULES_LIST}}",
+          "{{MODULE_STATISTICS}}",
+          "{{SYSTEM_STATUS}}",
+          "{{ACTIVE_MODULES}}"
+        ],
+        "generation_method": "variable_substitution"
+      },
+
+      "readme_template": {
+        "file": "templates/README.template.md",
+        "variables": [
+          "{{SYSTEM_VERSION}}",
+          "{{HEALTH_SCORE}}",
+          "{{HEALTH_COLOR}}",
+          "{{VALIDATION_STATUS}}",
+          "{{VALIDATION_COLOR}}",
+          "{{RULES_COUNT}}",
+          "{{ORIGINAL_RULES}}",
+          "{{CLAUDE_CODE_RULES}}",
+          "{{MODULE_DISTRIBUTION}}",
+          "{{SYSTEM_STATISTICS}}"
+        ],
+        "generation_method": "variable_substitution"
+      },
+
+      "version_template": {
+        "structure": "json",
+        "field_mappings": {
+          "system.version": "_schema_version",
+          "system.last_updated": "_last_updated",
+          "components.modules.rules": "extracted_rules_count",
+          "system.claude_code_rules_integrated": "claude_code_rules_count"
+        }
+      }
+    },
+
+    "validation_rules": {
+      "source_validation": {
+        "schema_validation": {
+          "enabled": true,
+          "schema_file": "schemas/dependency-graph.schema.json"
+        },
+        "content_validation": {
+          "enabled": true,
+          "required_fields": [
+            "_schema_version",
+            "_last_updated",
+            "modules"
+          ]
+        },
+        "integrity_validation": {
+          "enabled": true,
+          "checksum_validation": true,
+          "circular_dependency_check": true
+        }
+      },
+
+      "generated_file_validation": {
+        "consistency_check": {
+          "enabled": true,
+          "check_against_source": true,
+          "validation_rules": [
+            "version_consistency",
+            "count_consistency",
+            "content_integrity"
+          ]
+        },
+        "format_validation": {
+          "enabled": true,
+          "markdown_validation": true,
+          "json_validation": true
+        }
+      }
+    },
+
+    "conflict_resolution": {
+      "conflict_detection": {
+        "enabled": true,
+        "detection_methods": [
+          "timestamp_comparison",
+          "checksum_validation",
+          "content_diff_analysis"
+        ]
+      },
+
+      "resolution_strategies": {
+        "source_authority": {
+          "description": "Source (dependency-graph.json) always wins",
+          "priority": 1,
+          "method": "overwrite_derived_with_source"
+        },
+        "manual_intervention": {
+          "description": "Require manual intervention for unresolvable conflicts",
+          "priority": 2,
+          "method": "alert_and_block"
+        },
+        "auto_merge": {
+          "description": "Attempt automatic merge where safe",
+          "priority": 3,
+          "method": "intelligent_merge"
+        }
+      }
+    },
+
+    "backup_and_recovery": {
+      "backup_enabled": true,
+      "backup_triggers": [
+        "before_regeneration",
+        "before_major_changes",
+        "scheduled_backup"
+      ],
+      "backup_retention": {
+        "daily_backups": 7,
+        "weekly_backups": 4,
+        "monthly_backups": 12
+      },
+      "recovery_methods": {
+        "restore_from_backup": {
+          "enabled": true,
+          "method": "file_restoration"
+        },
+        "regenerate_from_source": {
+          "enabled": true,
+          "method": "full_regeneration"
+        }
+      }
+    },
+
+    "monitoring": {
+      "synchronization_metrics": [
+        "regeneration_success_rate",
+        "consistency_score",
+        "generation_duration",
+        "conflict_frequency"
+      ],
+      "health_indicators": [
+        "source_file_health",
+        "derived_files_health",
+        "synchronization_lag",
+        "error_rate"
+      ],
+      "alerts": [
+        {
+          "name": "synchronization_failure",
+          "condition": "regeneration_success_rate < 95%",
+          "action": "immediate_investigation"
+        },
+        {
+          "name": "consistency_degradation",
+          "condition": "consistency_score < 100%",
+          "action": "auto_correction_trigger"
+        },
+        {
+          "name": "source_corruption",
+          "condition": "source_file_health < 100%",
+          "action": "emergency_rollback"
+        }
+      ]
+    },
+
+    "access_control": {
+      "read_only_mode": false,
+      "source_modification_restricted": true,
+      "derived_file_modification_blocked": true,
+      "override_capabilities": {
+        "emergency_override": {
+          "enabled": true,
+          "require_confirmation": true,
+          "log_override": true,
+          "auto_revert": true,
+          "revert_delay": 3600
+        },
+        "maintenance_mode": {
+          "enabled": true,
+          "allow_source_modification": true,
+          "suspend_synchronization": true,
+          "require_manual_commit": true
+        }
+      }
+    },
+
+    "testing_framework": {
+      "test_scenarios": [
+        {
+          "name": "source_authority_test",
+          "description": "Test that source file maintains authority",
+          "method": "modify_derived_files_and_verify_restoration"
+        },
+        {
+          "name": "synchronization_test",
+          "description": "Test automatic synchronization",
+          "method": "modify_source_and_verify_propagation"
+        },
+        {
+          "name": "consistency_test",
+          "description": "Test cross-file consistency",
+          "method": "validate_all_files_consistency"
+        },
+        {
+          "name": "recovery_test",
+          "description": "Test backup and recovery",
+          "method": "simulate_corruption_and_test_recovery"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "agent-001",
+  "type": "agent",
+  "version": "1.0.0",
+  "description": "Specialized agent for reviewing code against all active rules and standards",
+  "parents": ["CLAUDE.md"],
+  "children": [],
+  "auto_cascade": "manual",
+  "last_updated": "2025-10-19",
+  "capabilities": {
+    "primary": ["code_review", "standards_validation", "quality_assessment"],
+    "secondary": ["suggestion_generation", "best_practices_enforcement", "automated_feedback"]
+  },
+  "configuration": {
+    "review_scope": {
+      "include_files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.py", "*.sql"],
+      "exclude_patterns": ["node_modules", "*.test.*", "*.spec.*", "dist/", "build/"],
+      "focus_areas": [
+        "naming_conventions",
+        "type_safety",
+        "error_handling",
+        "security_practices",
+        "documentation",
+        "testing_coverage",
+        "performance_patterns"
+      ]
+    },
+    "severity_levels": {
+      "critical": {
+        "description": "Must fix before merge",
+        "examples": ["security_vulnerabilities", "type_errors", "breaking_changes"]
+      },
+      "error": {
+        "description": "Should fix before merge",
+        "examples": ["naming_violations", "missing_error_handling", "undocumented_apis"]
+      },
+      "warning": {
+        "description": "Consider fixing",
+        "examples": ["styling_inconsistencies", "suboptimal_patterns", "missing_tests"]
+      },
+      "info": {
+        "description": "Suggestions for improvement",
+        "examples": ["performance_optimizations", "code_organization", "best_practices"]
+      }
+    },
+    "output_format": {
+      "structure": {
+        "summary": "Brief overview of review results",
+        "issues_by_severity": "Detailed issues grouped by severity level",
+        "suggestions": "Actionable improvement suggestions",
+        "metrics": "Code quality metrics and statistics",
+        "approval_status": "Recommended approval decision"
+      },
+      "include_suggestions": true,
+      "include_examples": true,
+      "include_fixes": true
+    }
+  },
+  "integration_points": {
+    "required_modules": [
+      "naming-conventions",
+      "code-style",
+      "error-handling",
+      "security-rules",
+      "documentation-rules",
+      "testing-standards"
+    ],
+    "compatible_tools": ["ESLint", "Pylint", "SonarQube", "GitHub Actions"],
+    "output_targets": ["pull_requests", "code_review_comments", "quality_reports"]
+  },
+  "workflow": {
+    "trigger_conditions": [
+      "pull_request_created",
+      "code_submitted_for_review",
+      "manual_review_requested"
+    ],
+    "review_process": [
+      "parse_and_analyze_code",
+      "apply_rule_validations",
+      "check_dependencies_and_references",
+      "evaluate_quality_metrics",
+      "generate_review_report",
+      "provide_actionable_feedback"
+    ],
+    "escalation_rules": {
+      "critical_issues": "block_merge",
+      "multiple_errors": "require_human_review",
+      "complex_patterns": "recommend_specialist_review"
+    }
+  },
+  "performance": {
+    "max_file_size": "1MB",
+    "timeout_seconds": 300,
+    "parallel_processing": true,
+    "cache_results": true
+  },
+  "learning_capabilities": {
+    "pattern_recognition": true,
+    "context_awareness": true,
+    "adaptation_enabled": true,
+    "feedback_integration": true
+  }
+}

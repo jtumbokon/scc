@@ -1,0 +1,141 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.local
+.env.production
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+.tmp/
+
+# Backup directories
+*.bak
+*.backup
+registry/.cascade-backups/
+registry/.transaction-backups/
+registry/.test-data/
+registry/.test-logs/
+registry/.test-reports/
+registry/.atomic-transactions.log
+
+# Claude specific
+.claude/secrets/
+.claude/.cache/
+.claude/temp/
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Compiled binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Test artifacts
+test-results/
+coverage/
+
+# Security
+github_pat_*
+*token*
+*secret*
+*.pem
+*.key

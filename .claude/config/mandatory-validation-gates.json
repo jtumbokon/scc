@@ -1,0 +1,456 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Mandatory Validation Gates - Block operations if system consistency is compromised",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "validation_gates": {
+    "enabled": true,
+    "blocking_mode": true,
+    "strict_mode": true,
+    "fail_fast": true,
+    "auto_fix_enabled": true,
+    "notification_required": true,
+
+    "gate_definitions": {
+      "pre_operation_gates": {
+        "system_health_gate": {
+          "name": "System Health Check",
+          "description": "Verify system is healthy before any operation",
+          "enabled": true,
+          "critical": true,
+          "blocking": true,
+          "timeout": 30,
+          "retry_count": 3,
+          "retry_delay": 5,
+
+          "validations": [
+            {
+              "name": "check_critical_files_exist",
+              "type": "file_existence",
+              "critical": true,
+              "files": [
+                "CLAUDE.md",
+                "version.json",
+                "registry/dependency-graph.json",
+                "config/cascade-coordinator.json",
+                "config/post-cascade-validator.json",
+                "config/mandatory-validation-gates.json"
+              ]
+            },
+            {
+              "name": "check_file_permissions",
+              "type": "file_permissions",
+              "critical": true,
+              "required_permissions": ["read", "write"]
+            },
+            {
+              "name": "check_json_structure",
+              "type": "schema_validation",
+              "critical": true,
+              "files": [
+                "version.json",
+                "registry/dependency-graph.json",
+                "config/cascade-coordinator.json",
+                "config/post-cascade-validator.json"
+              ]
+            },
+            {
+              "name": "check_registry_integrity",
+              "type": "consistency_check",
+              "critical": true,
+              "source": "dependency-graph.json"
+            }
+          ],
+
+          "failure_actions": {
+            "any_failure": "block_operation",
+            "critical_failure": "block_operation_and_alert",
+            "non_critical_failure": "log_warning_and_proceed"
+          }
+        },
+
+        "consistency_gate": {
+          "name": "Cross-File Consistency Check",
+          "description": "Verify all system files are synchronized",
+          "enabled": true,
+          "critical": true,
+          "blocking": true,
+          "timeout": 60,
+          "retry_count": 2,
+          "retry_delay": 10,
+
+          "validations": [
+            {
+              "name": "version_consistency_check",
+              "type": "cross_file_validation",
+              "critical": true,
+              "files": [
+                "version.json:system.version",
+                "CLAUDE.md:line_8",
+                "README.md:line_5",
+                "dependency-graph.json:_schema_version"
+              ],
+              "tolerance": "exact_match"
+            },
+            {
+              "name": "rule_count_consistency_check",
+              "type": "cross_file_validation",
+              "critical": true,
+              "files": [
+                "dependency-graph.json:modules.rule_count",
+                "CLAUDE.md:rules_list_count",
+                "README.md:rules_statistics"
+              ],
+              "tolerance": "exact_match"
+            },
+            {
+              "name": "module_list_consistency_check",
+              "type": "cross_file_validation",
+              "critical": true,
+              "files": [
+                "dependency-graph.json:modules",
+                "CLAUDE.md:active_modules"
+              ],
+              "tolerance": "exact_match"
+            },
+            {
+              "name": "timestamp_consistency_check",
+              "type": "cross_file_validation",
+              "critical": false,
+              "files": [
+                "version.json:system.last_updated",
+                "dependency-graph.json:_last_updated",
+                "update-log.json:latest_timestamp"
+              ],
+              "tolerance": "chronological"
+            }
+          ],
+
+          "auto_fix_strategies": {
+            "version_mismatch": {
+              "enabled": true,
+              "strategy": "use_dependency_graph_as_source",
+              "auto_commit": true
+            },
+            "rule_count_mismatch": {
+              "enabled": true,
+              "strategy": "regenerate_from_dependency_graph",
+              "auto_commit": true
+            },
+            "module_list_mismatch": {
+              "enabled": true,
+              "strategy": "update_from_dependency_graph",
+              "auto_commit": true
+            },
+            "timestamp_inconsistency": {
+              "enabled": true,
+              "strategy": "update_to_current_timestamp",
+              "auto_commit": true
+            }
+          },
+
+          "failure_actions": {
+            "any_failure": "block_operation",
+            "critical_failure": "block_operation_and_alert",
+            "auto_fix_failure": "block_operation_and_request_manual_intervention"
+          }
+        },
+
+        "dependency_integrity_gate": {
+          "name": "Dependency Integrity Check",
+          "description": "Verify dependency graph is valid and has no issues",
+          "enabled": true,
+          "critical": true,
+          "blocking": true,
+          "timeout": 45,
+          "retry_count": 1,
+          "retry_delay": 0,
+
+          "validations": [
+            {
+              "name": "check_circular_dependencies",
+              "type": "graph_analysis",
+              "critical": true,
+              "max_depth": 10
+            },
+            {
+              "name": "check_missing_dependencies",
+              "type": "graph_analysis",
+              "critical": true
+            },
+            {
+              "name": "check_version_conflicts",
+              "type": "version_analysis",
+              "critical": false
+            },
+            {
+              "name": "check_orphaned_modules",
+              "type": "graph_analysis",
+              "critical": false
+            }
+          ],
+
+          "failure_actions": {
+            "any_failure": "block_operation",
+            "critical_failure": "block_operation_and_alert",
+            "version_conflict": "log_warning_and_proceed"
+          }
+        },
+
+        "resource_availability_gate": {
+          "name": "Resource Availability Check",
+          "description": "Verify system has sufficient resources for operation",
+          "enabled": true,
+          "critical": true,
+          "blocking": true,
+          "timeout": 15,
+          "retry_count": 3,
+          "retry_delay": 5,
+
+          "validations": [
+            {
+              "name": "check_disk_space",
+              "type": "system_resource",
+              "critical": true,
+              "minimum_space_mb": 100
+            },
+            {
+              "name": "check_memory_availability",
+              "type": "system_resource",
+              "critical": true,
+              "minimum_memory_mb": 512
+            },
+            {
+              "name": "check_file_descriptors",
+              "type": "system_resource",
+              "critical": false,
+              "minimum_descriptors": 100
+            }
+          ],
+
+          "failure_actions": {
+            "any_failure": "block_operation",
+            "critical_failure": "block_operation_and_alert",
+            "non_critical_failure": "log_warning_and_proceed"
+          }
+        }
+      },
+
+      "post_operation_gates": {
+        "immediate_validation_gate": {
+          "name": "Immediate Post-Operation Validation",
+          "description": "Validate system immediately after operation completion",
+          "enabled": true,
+          "critical": true,
+          "blocking": false,
+          "timeout": 30,
+          "trigger": "operation_completion",
+
+          "validations": [
+            {
+              "name": "verify_updated_files",
+              "type": "file_validation",
+              "critical": true
+            },
+            {
+              "name": "check_consistency_maintained",
+              "type": "consistency_check",
+              "critical": true
+            },
+            {
+              "name": "validate_dependency_graph_integrity",
+              "type": "graph_analysis",
+              "critical": true
+            }
+          ],
+
+          "failure_actions": {
+            "any_failure": "rollback_operation",
+            "critical_failure": "rollback_operation_and_alert",
+            "minor_issue": "log_warning_and_monitor"
+          }
+        },
+
+        "comprehensive_validation_gate": {
+          "name": "Comprehensive Post-Operation Validation",
+          "description": "Full system validation after operation completion",
+          "enabled": true,
+          "critical": true,
+          "blocking": false,
+          "timeout": 120,
+          "trigger": "operation_completion",
+          "delay": 30,
+
+          "validations": [
+            {
+              "name": "full_system_consistency_check",
+              "type": "comprehensive_validation",
+              "critical": true
+            },
+            {
+              "name": "documentation_synchronization_check",
+              "type": "documentation_validation",
+              "critical": true
+            },
+            {
+              "name": "performance_impact_assessment",
+              "type": "performance_check",
+              "critical": false
+            }
+          ],
+
+          "failure_actions": {
+            "any_failure": "initiate_correction_or_rollback",
+            "critical_failure": "rollback_operation_and_alert",
+            "performance_issue": "log_warning_and_optimize"
+          }
+        }
+      }
+    },
+
+    "gate_execution": {
+      "execution_order": [
+        "system_health_gate",
+        "resource_availability_gate",
+        "consistency_gate",
+        "dependency_integrity_gate"
+      ],
+
+      "execution_mode": {
+        "parallel_execution": false,
+        "fail_fast": true,
+        "continue_on_non_critical_failure": false,
+        "collect_all_results": true
+      },
+
+      "gate_status": {
+        "pending": "Gate waiting to be executed",
+        "running": "Gate currently executing",
+        "passed": "Gate passed successfully",
+        "failed": "Gate failed with critical issues",
+        "failed_with_fix": "Gate failed but auto-fix applied",
+        "skipped": "Gate skipped due to configuration",
+        "timeout": "Gate execution timed out"
+      }
+    },
+
+    "blocking_behavior": {
+      "blocking_enabled": true,
+      "blocking_scenarios": [
+        {
+          "scenario": "any_critical_gate_failure",
+          "action": "block_operation",
+          "user_message": "Operation blocked due to critical validation failures. Please resolve issues and retry."
+        },
+        {
+          "scenario": "system_unhealthy",
+          "action": "block_operation",
+          "user_message": "System health check failed. Operation blocked until system is healthy."
+        },
+        {
+          "scenario": "consistency_issues_detected",
+          "action": "block_operation",
+          "user_message": "Consistency issues detected. Operation blocked until synchronization is complete."
+        },
+        {
+          "scenario": "auto_fix_failed",
+          "action": "block_operation",
+          "user_message": "Auto-fix attempts failed. Manual intervention required before proceeding."
+        }
+      ],
+
+      "override_capabilities": {
+        "enabled": true,
+        "require_confirmation": true,
+        "log_override": true,
+        "override_scenarios": [
+          "emergency_maintenance",
+          "debugging_mode",
+          "expert_user_override"
+        ]
+      }
+    },
+
+    "auto_fix_capabilities": {
+      "enabled": true,
+      "auto_commit_fixes": true,
+      "backup_before_fix": true,
+      "fix_timeout": 60,
+      "fix_strategies": {
+        "version_synchronization": {
+          "enabled": true,
+          "source_of_truth": "dependency-graph.json",
+          "method": "overwrite_from_source"
+        },
+        "rules_list_regeneration": {
+          "enabled": true,
+          "source": "dependency-graph.json",
+          "template": "templates/rules-section.template.md"
+        },
+        "module_list_synchronization": {
+          "enabled": true,
+          "source": "dependency-graph.json",
+          "method": "update_from_dependency_graph"
+        },
+        "file_structure_repair": {
+          "enabled": true,
+          "method": "restore_from_template_or_default"
+        }
+      }
+    },
+
+    "monitoring_and_alerting": {
+      "enabled": true,
+      "gate_performance_metrics": [
+        "gate_execution_time",
+        "gate_success_rate",
+        "auto_fix_success_rate",
+        "block_frequency"
+      ],
+
+      "alerts": [
+        {
+          "name": "gate_failure_rate_high",
+          "condition": "gate_success_rate < 95%",
+          "action": "system_health_check"
+        },
+        {
+          "name": "auto_fix_failure_rate_high",
+          "condition": "auto_fix_success_rate < 90%",
+          "action": "manual_intervention_required"
+        },
+        {
+          "name": "blocking_frequency_high",
+          "condition": "block_frequency > 10%",
+          "action": "system_analysis"
+        }
+      ],
+
+      "notification_channels": [
+        "system_log",
+        "user_interface",
+        "email_alerts"
+      ]
+    },
+
+    "testing_framework": {
+      "test_scenarios": [
+        {
+          "name": "gate_blocking_test",
+          "description": "Test that gates properly block operations",
+          "method": "simulate_failures_and_verify_blocking"
+        },
+        {
+          "name": "auto_fix_test",
+          "description": "Test auto-fix capabilities",
+          "method": "create_issues_and_verify_auto_fix"
+        },
+        {
+          "name": "gate_performance_test",
+          "description": "Test gate execution performance",
+          "method": "measure_gate_execution_times"
+        }
+      ]
+    }
+  }
+}

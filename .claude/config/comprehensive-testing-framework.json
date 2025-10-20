@@ -1,0 +1,549 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Comprehensive Testing Framework - Validates all cascade operations and system integrity",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "testing_framework": {
+    "enabled": true,
+    "test_environment": "isolated",
+    "automatic_execution": true,
+    "test_timeout": 600,
+    "parallel_execution": false,
+    "continue_on_failure": false,
+
+    "test_categories": {
+      "unit_tests": {
+        "description": "Test individual components in isolation",
+        "test_count": 15,
+        "execution_order": 1,
+        "tests": [
+          {
+            "name": "dependency_graph_validation",
+            "description": "Validate dependency graph structure and integrity",
+            "type": "unit",
+            "critical": true,
+            "timeout": 30,
+            "test_method": "validate_dependency_graph_structure"
+          },
+          {
+            "name": "version_consistency_validation",
+            "description": "Validate version consistency across files",
+            "type": "unit",
+            "critical": true,
+            "timeout": 15,
+            "test_method": "check_version_consistency"
+          },
+          {
+            "name": "module_count_validation",
+            "description": "Validate module counts match across files",
+            "type": "unit",
+            "critical": true,
+            "timeout": 15,
+            "test_method": "validate_module_counts"
+          },
+          {
+            "name": "schema_validation",
+            "description": "Validate JSON schemas for all configuration files",
+            "type": "unit",
+            "critical": true,
+            "timeout": 45,
+            "test_method": "validate_all_schemas"
+          },
+          {
+            "name": "file_integrity_validation",
+            "description": "Validate file integrity and accessibility",
+            "type": "unit",
+            "critical": true,
+            "timeout": 20,
+            "test_method": "check_file_integrity"
+          }
+        ]
+      },
+
+      "integration_tests": {
+        "description": "Test component interactions and workflows",
+        "test_count": 12,
+        "execution_order": 2,
+        "tests": [
+          {
+            "name": "cascade_engine_integration",
+            "description": "Test cascade engine with all components",
+            "type": "integration",
+            "critical": true,
+            "timeout": 120,
+            "test_method": "test_cascade_engine_integration"
+          },
+          {
+            "name": "atomic_transaction_integration",
+            "description": "Test atomic transaction system",
+            "type": "integration",
+            "critical": true,
+            "timeout": 90,
+            "test_method": "test_atomic_transaction_system"
+          },
+          {
+            "name": "validation_gates_integration",
+            "description": "Test validation gates with cascade operations",
+            "type": "integration",
+            "critical": true,
+            "timeout": 80,
+            "test_method": "test_validation_gates_integration"
+          },
+          {
+            "name": "single_source_truth_integration",
+            "description": "Test single source of truth pattern",
+            "type": "integration",
+            "critical": true,
+            "timeout": 100,
+            "test_method": "test_single_source_truth_pattern"
+          },
+          {
+            "name": "post_cascade_validation_integration",
+            "description": "Test post-cascade validation system",
+            "type": "integration",
+            "critical": true,
+            "timeout": 70,
+            "test_method": "test_post_cascade_validation"
+          }
+        ]
+      },
+
+      "end_to_end_tests": {
+        "description": "Test complete workflows from start to finish",
+        "test_count": 8,
+        "execution_order": 3,
+        "tests": [
+          {
+            "name": "module_creation_workflow",
+            "description": "Test complete module creation workflow",
+            "type": "end_to_end",
+            "critical": true,
+            "timeout": 180,
+            "test_method": "test_complete_module_creation"
+          },
+          {
+            "name": "module_update_workflow",
+            "description": "Test complete module update workflow",
+            "type": "end_to_end",
+            "critical": true,
+            "timeout": 150,
+            "test_method": "test_complete_module_update"
+          },
+          {
+            "name": "bulk_operations_workflow",
+            "description": "Test bulk module operations workflow",
+            "type": "end_to_end",
+            "critical": true,
+            "timeout": 240,
+            "test_method": "test_bulk_operations_workflow"
+          },
+          {
+            "name": "system_version_update_workflow",
+            "description": "Test system version update workflow",
+            "type": "end_to_end",
+            "critical": true,
+            "timeout": 200,
+            "test_method": "test_system_version_update"
+          },
+          {
+            "name": "failure_recovery_workflow",
+            "description": "Test failure and recovery workflows",
+            "type": "end_to_end",
+            "critical": true,
+            "timeout": 200,
+            "test_method": "test_failure_recovery_workflows"
+          }
+        ]
+      },
+
+      "performance_tests": {
+        "description": "Test system performance under various conditions",
+        "test_count": 6,
+        "execution_order": 4,
+        "tests": [
+          {
+            "name": "cascade_performance_test",
+            "description": "Test cascade operation performance",
+            "type": "performance",
+            "critical": false,
+            "timeout": 120,
+            "test_method": "measure_cascade_performance"
+          },
+          {
+            "name": "validation_performance_test",
+            "description": "Test validation gate performance",
+            "type": "performance",
+            "critical": false,
+            "timeout": 90,
+            "test_method": "measure_validation_performance"
+          },
+          {
+            "name": "synchronization_performance_test",
+            "description": "Test file synchronization performance",
+            "type": "performance",
+            "critical": false,
+            "timeout": 100,
+            "test_method": "measure_synchronization_performance"
+          },
+          {
+            "name": "load_test",
+            "description": "Test system under heavy load",
+            "type": "performance",
+            "critical": false,
+            "timeout": 300,
+            "test_method": "simulate_heavy_load"
+          }
+        ]
+      },
+
+      "stress_tests": {
+        "description": "Test system limits and failure modes",
+        "test_count": 5,
+        "execution_order": 5,
+        "tests": [
+          {
+            "name": "concurrent_operations_stress_test",
+            "description": "Test concurrent cascade operations",
+            "type": "stress",
+            "critical": false,
+            "timeout": 300,
+            "test_method": "stress_concurrent_operations"
+          },
+          {
+            "name": "large_dataset_stress_test",
+            "description": "Test with large number of modules",
+            "type": "stress",
+            "critical": false,
+            "timeout": 400,
+            "test_method": "stress_large_dataset"
+          },
+          {
+            "name": "failure_injection_stress_test",
+            "description": "Test with various failure scenarios",
+            "type": "stress",
+            "critical": false,
+            "timeout": 250,
+            "test_method": "inject_and_test_failures"
+          }
+        ]
+      },
+
+      "regression_tests": {
+        "description": "Test against known issues and prevent regressions",
+        "test_count": 10,
+        "execution_order": 6,
+        "tests": [
+          {
+            "name": "synchronization_regression_test",
+            "description": "Test for previous synchronization issues",
+            "type": "regression",
+            "critical": true,
+            "timeout": 60,
+            "test_method": "test_synchronization_regression"
+          },
+          {
+            "name": "version_consistency_regression_test",
+            "description": "Test for previous version consistency issues",
+            "type": "regression",
+            "critical": true,
+            "timeout": 45,
+            "test_method": "test_version_consistency_regression"
+          },
+          {
+            "name": "atomic_transaction_regression_test",
+            "description": "Test for previous atomic transaction issues",
+            "type": "regression",
+            "critical": true,
+            "timeout": 70,
+            "test_method": "test_atomic_transaction_regression"
+          }
+        ]
+      }
+    },
+
+    "test_scenarios": {
+      "atomic_cascade_test": {
+        "description": "Test atomic all-or-none cascade behavior",
+        "test_steps": [
+          {
+            "step": "setup_test_environment",
+            "action": "create_test_backup"
+          },
+          {
+            "step": "simulate_cascade_failure",
+            "action": "introduce_failure_at_various_stages"
+          },
+          {
+            "step": "verify_rollback",
+            "action": "check_complete_rollback_to_original_state"
+          },
+          {
+            "step": "verify_system_integrity",
+            "action": "validate_system_after_rollback"
+          },
+          {
+            "step": "cleanup",
+            "action": "restore_from_backup"
+          }
+        ],
+        "validation_criteria": [
+          "no_partial_updates_remain",
+          "system_returns_to_original_state",
+          "all_files_consistent_after_rollback",
+          "no_corruption_detected"
+        ]
+      },
+
+      "consistency_validation_test": {
+        "description": "Test cross-file consistency validation",
+        "test_steps": [
+          {
+            "step": "capture_baseline_state",
+            "action": "record_current_consistency_metrics"
+          },
+          {
+            "step": "modify_dependency_graph",
+            "action": "add_test_modules_and_dependencies"
+          },
+          {
+            "step": "trigger_cascade",
+            "action": "execute_cascade_update"
+          },
+          {
+            "step": "validate_consistency",
+            "action": "check_all_files_synchronized"
+          },
+          {
+            "step": "cleanup",
+            "action": "remove_test_modules"
+          }
+        ],
+        "validation_criteria": [
+          "all_versions_match_across_files",
+          "module_counts_consistent",
+          "timestamps_chronological",
+          "no_orphaned_references"
+        ]
+      },
+
+      "single_source_truth_test": {
+        "description": "Test single source of truth pattern",
+        "test_steps": [
+          {
+            "step": "identify_source_file",
+            "action": "confirm_dependency_graph_as_source"
+          },
+          {
+            "step": "modify_derived_files",
+            "action": "manually_change_readme_and_claude_md"
+          },
+          {
+            "step": "trigger_synchronization",
+            "action": "execute_synchronization_trigger"
+          },
+          {
+            "step": "verify_source_authority",
+            "action": "confirm_derived_files_restored_from_source"
+          },
+          {
+            "step": "cleanup",
+            "action": "restore_derived_files_to_correct_state"
+          }
+        ],
+        "validation_criteria": [
+          "source_file_maintains_authority",
+          "derived_files_regenerated_from_source",
+          "manual_changes_overwritten",
+          "consistency_maintained"
+        ]
+      },
+
+      "validation_gates_test": {
+        "description": "Test validation gates blocking behavior",
+        "test_steps": [
+          {
+            "step": "setup_healthy_system",
+            "action": "ensure_system_passes_all_validations"
+          },
+          {
+            "step": "introduce_consistency_issue",
+            "action": "create_version_mismatch_between_files"
+          },
+          {
+            "step": "attempt_operation",
+            "action": "try_to_execute_cascade_operation"
+          },
+          {
+            "step": "verify_blocking",
+            "action": "confirm_operation_blocked_by_validation_gate"
+          },
+          {
+            "step": "fix_issue_and_retry",
+            "action": "resolve_consistency_issue and retry operation"
+          },
+          {
+            "step": "verify_success",
+            "action": "confirm_operation_succeeds_after_fix"
+          },
+          {
+            "step": "cleanup",
+            "action": "restore_system_to_original_state"
+          }
+        ],
+        "validation_criteria": [
+          "validation_gates_detect_issues",
+          "operations_blocked_when_inconsistent",
+          "operations_proceed_when_consistent",
+          "auto_fix_applied_when_possible"
+        ]
+      },
+
+      "performance_benchmark_test": {
+        "description": "Test and benchmark system performance",
+        "test_steps": [
+          {
+            "step": "establish_baseline",
+            "action": "measure_current_performance_metrics"
+          },
+          {
+            "step": "test_single_module_cascade",
+            "action": "measure_time_for_single_module_update"
+          },
+          {
+            "step": "test_bulk_operations",
+            "action": "measure_time_for_bulk_module_operations"
+          },
+          {
+            "step": "test_validation_performance",
+            "action": "measure_validation_gate_execution_time"
+          },
+          {
+            "step": "test_synchronization_performance",
+            "action": "measure_file_synchronization_time"
+          },
+          {
+            "step": "compare_with_benchmarks",
+            "action": "analyze_performance_against_targets"
+          }
+        ],
+        "performance_targets": {
+          "single_module_cascade": "< 10 seconds",
+          "bulk_operations": "< 60 seconds",
+          "validation_gates": "< 5 seconds",
+          "synchronization": "< 15 seconds",
+          "total_transaction": "< 90 seconds"
+        },
+        "validation_criteria": [
+          "all_performance_targets_met",
+          "no_memory_leaks_detected",
+          "system_remains_responsive",
+          "resource_usage_within_limits"
+        ]
+      }
+    },
+
+    "test_execution": {
+      "execution_schedule": {
+        "unit_tests": {
+          "frequency": "on_every_cascade",
+          "parallel": true,
+          "timeout": 120
+        },
+        "integration_tests": {
+          "frequency": "daily",
+          "parallel": false,
+          "timeout": 600
+        },
+        "end_to_end_tests": {
+          "frequency": "weekly",
+          "parallel": false,
+          "timeout": 1800
+        },
+        "performance_tests": {
+          "frequency": "weekly",
+          "parallel": false,
+          "timeout": 1200
+        },
+        "stress_tests": {
+          "frequency": "monthly",
+          "parallel": false,
+          "timeout": 2400
+        },
+        "regression_tests": {
+          "frequency": "on_every_cascade",
+          "parallel": true,
+          "timeout": 300
+        }
+      },
+
+      "test_environment": {
+        "isolation_level": "full",
+        "backup_before_test": true,
+        "restore_after_test": true,
+        "test_data_directory": "registry/.test-data",
+        "test_logs_directory": "registry/.test-logs",
+        "test_reports_directory": "registry/.test-reports"
+      },
+
+      "test_reporting": {
+        "report_format": "structured_json",
+        "include_sections": [
+          "test_execution_summary",
+          "individual_test_results",
+          "performance_metrics",
+          "failure_analysis",
+          "recommendations"
+        ],
+        "report_retention_days": 90,
+        "alert_on_failure": true
+      }
+    },
+
+    "test_data_management": {
+      "test_data_sets": {
+        "minimal_system": {
+          "description": "Minimal working system state",
+          "modules_count": 10,
+          "dependencies_count": 15
+        },
+        "typical_system": {
+          "description": "Typical production system state",
+          "modules_count": 50,
+          "dependencies_count": 75
+        },
+        "large_system": {
+          "description": "Large system state for stress testing",
+          "modules_count": 200,
+          "dependencies_count": 400
+        }
+      },
+
+      "data_generation": {
+        "auto_generate_test_data": true,
+        "generation_rules": {
+          "module_ids": "sequential_numbering",
+          "dependencies": "realistic_patterns",
+          "versions": "semantic_versioning",
+          "metadata": "realistic_content"
+        }
+      }
+    },
+
+    "continuous_integration": {
+      "enabled": true,
+      "ci_pipeline_integration": true,
+      "failure_threshold": {
+        "unit_tests": 0,
+        "integration_tests": 0,
+        "critical_tests": 0,
+        "overall_tests": 5
+      },
+      "rollback_on_failure": true,
+      "notification_channels": [
+        "development_team",
+        "system_administrators",
+        "stakeholders"
+      ]
+    }
+  }
+}

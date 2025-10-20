@@ -1,0 +1,125 @@
+{
+  "validation_rules": {
+    "system_integrity": {
+      "required_files": [
+        "CLAUDE.md",
+        "version.json",
+        "config/cascade-rules.json",
+        "config/validation-rules.json",
+        "registry/dependency-graph.json"
+      ],
+      "required_directories": [
+        "modules/rules",
+        "modules/templates",
+        "modules/agents",
+        "modules/skills",
+        "modules/commands",
+        "modules/hooks",
+        "registry",
+        "config"
+      ]
+    },
+    "module_validation": {
+      "required_frontmatter": [
+        "id",
+        "type",
+        "version",
+        "description",
+        "parents",
+        "children",
+        "auto_cascade",
+        "last_updated"
+      ],
+      "version_format": "semantic",
+      "id_format": "type-###",
+      "dependency_validation": true
+    },
+    "dependency_checks": {
+      "circular_dependencies": {
+        "enabled": true,
+        "max_depth": 10,
+        "error_level": "critical"
+      },
+      "missing_dependencies": {
+        "enabled": true,
+        "error_level": "error"
+      },
+      "version_conflicts": {
+        "enabled": true,
+        "error_level": "warning",
+        "auto_resolve": true
+      }
+    },
+    "content_validation": {
+      "markdown_rules": {
+        "required_headers": ["## Purpose", "## Configuration", "## Usage"],
+        "code_block_validation": true,
+        "link_validation": true
+      },
+      "json_rules": {
+        "schema_validation": true,
+        "required_fields": true,
+        "type_validation": true
+      },
+      "yaml_rules": {
+        "schema_validation": true,
+        "required_fields": true,
+        "type_validation": true
+      }
+    },
+    "version_compatibility": {
+      "check_semver": true,
+      "breaking_change_detection": true,
+      "compatibility_matrix": {
+        "1.0.0": {
+          "compatible_with": [">=1.0.0"],
+          "breaking_changes": []
+        }
+      }
+    },
+    "performance_checks": {
+      "dependency_graph_size": {
+        "max_nodes": 1000,
+        "max_edges": 5000,
+        "warning_threshold": 0.8
+      },
+      "cascade_performance": {
+        "max_cascade_time": 300,
+        "max_parallel_updates": 10,
+        "memory_limit": "512MB"
+      }
+    }
+  },
+  "validation_actions": {
+    "on_error": {
+      "critical": ["block_operation", "log_error", "notify_user"],
+      "error": ["log_error", "suggest_fix", "require_confirmation"],
+      "warning": ["log_warning", "suggest_fix"]
+    },
+    "on_success": {
+      "log_success": true,
+      "update_cache": true,
+      "continue_operation": true
+    }
+  },
+  "auto_fix_rules": {
+    "enabled": true,
+    "fixes": [
+      "update_missing_version",
+      "fix_invalid_id_format",
+      "add_missing_frontmatter",
+      "update_dependency_references"
+    ],
+    "require_confirmation": [
+      "delete_dependencies",
+      "change_version_major",
+      "modify_structure"
+    ]
+  },
+  "reporting": {
+    "validation_log": "registry/validation-log.json",
+    "error_summary": true,
+    "performance_metrics": true,
+    "dependency_analysis": true
+  }
+}

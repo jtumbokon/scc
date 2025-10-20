@@ -1,0 +1,755 @@
+{
+  "_schema_version": "2.0",
+  "_last_updated": "2025-10-20T21:00:00Z",
+  "_description": "Enhanced dependency graph with dynamic agent discovery metadata - CASCADE UPDATED with 32 Claude Code rules",
+  "_cascade_update": {
+    "triggered_at": "2025-10-20T21:00:00Z",
+    "version_bump": "2.1.0 → 2.2.0",
+    "changes": "Integrated 32 Claude Code rules (adapted from cursor rules) with complete Super-Claude template compliance",
+    "cascade_status": "complete"
+  },
+
+  "modules": {
+    "pm-spec": {
+      "id": "agent-001",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/pm-spec.md",
+      "hash": "abc123def456",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["documentation-standards", "naming-conventions"],
+      "uses_templates": ["spec-template"],
+      "dependencies": ["mcp__archon-http__rag_search_knowledge_base", "mcp__archon-http__rag_search_code_examples"],
+
+      "_comment": "👇 AGENT-SPECIFIC METADATA FOR HOOKS 👇",
+      "agent_metadata": {
+        "triggered_by_status": "DRAFT",
+        "updates_status_to": "READY_FOR_ARCH",
+        "next_agent": "architect-review",
+        "queue_field": "spec_path",
+        "output_location": "docs/claude/working-notes/[slug].md",
+        "tools": ["Read", "Grep", "Glob", "github_list_issues", "slack_search_messages"],
+        "human_review_required": true,
+        "description": "Product manager that converts requirements into actionable specs. Use PROACTIVELY when given feature requests."
+      }
+    },
+
+    "architect-review": {
+      "id": "agent-002",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/architect-review.md",
+      "hash": "def456ghi789",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["security-rules", "documentation-standards", "naming-conventions"],
+      "uses_templates": ["component-template", "api-template"],
+      "dependencies": ["mcp__archon-http__rag_search_knowledge_base", "mcp__archon-http__rag_search_code_examples"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_ARCH",
+        "updates_status_to": "READY_FOR_BUILD",
+        "next_agent": "implementer-tester",
+        "queue_field": "adr_path",
+        "output_location": "docs/claude/decisions/ADR-[slug].md",
+        "tools": ["Read", "Grep", "Glob", "github_search_code", "github_list_issues"],
+        "human_review_required": true,
+        "description": "Software architect that validates designs and creates ADRs. Use PROACTIVELY when status is READY_FOR_ARCH."
+      }
+    },
+
+    "implementer-tester": {
+      "id": "agent-003",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/implementer-tester.md",
+      "hash": "ghi789jkl012",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["naming-conventions", "testing-standards", "security-rules", "code-style"],
+      "uses_templates": ["component-template", "test-template", "api-template"],
+      "dependencies": ["github_create_pr", "playwright_navigate", "playwright_screenshot"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_BUILD",
+        "updates_status_to": "DONE",
+        "next_agent": null,
+        "queue_field": "pr_url",
+        "output_location": "src/ (various files)",
+        "tools": ["Read", "Edit", "Write", "Bash", "Grep", "Glob", "github_create_pr", "playwright_navigate", "playwright_screenshot"],
+        "human_review_required": true,
+        "description": "Senior engineer implementing features with TDD. Use PROACTIVELY when status is READY_FOR_BUILD."
+      }
+    },
+
+    "_comment": "👇 ADD NEW AGENTS HERE - HOOKS AUTO-DISCOVER 👇",
+
+    "security-auditor": {
+      "id": "agent-004",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/security-auditor.md",
+      "hash": "jkl012mno345",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["security-rules"],
+      "dependencies": ["mcp__archon-http__rag_search_knowledge_base"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_SECURITY_AUDIT",
+        "updates_status_to": "SECURITY_APPROVED",
+        "next_agent": "implementer-tester",
+        "queue_field": "security_audit_path",
+        "output_location": "docs/claude/security/[slug]-audit.md",
+        "tools": ["Read", "Grep", "Glob", "Edit", "Write", "mcp__archon-http__rag_search_knowledge_base"],
+        "human_review_required": true,
+        "description": "Security specialist that audits designs and implementations for vulnerabilities and compliance"
+      }
+    },
+
+    "documentation-writer": {
+      "id": "agent-005",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/documentation-writer.md",
+      "hash": "mno345pqr678",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["documentation-standards", "naming-conventions"],
+      "uses_templates": ["documentation-template"],
+      "dependencies": [],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_DOCS",
+        "updates_status_to": "DOCS_COMPLETE",
+        "next_agent": null,
+        "queue_field": "docs_path",
+        "output_location": "docs/[slug]/",
+        "tools": ["Read", "Grep", "Glob", "Edit", "Write"],
+        "human_review_required": false,
+        "description": "Technical writer that creates comprehensive documentation for completed features"
+      }
+    },
+
+    "performance-analyst": {
+      "id": "agent-006",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/performance-analyst.md",
+      "hash": "pqr678stu901",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["documentation-standards"],
+      "dependencies": ["mcp__chrome-devtools__performance_start_trace", "mcp__chrome_devtools__performance_stop_trace"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_PERFORMANCE_ANALYSIS",
+        "updates_status_to": "PERFORMANCE_APPROVED",
+        "next_agent": "documentation-writer",
+        "queue_field": "performance_report_path",
+        "output_location": "docs/performance/[slug]-analysis.md",
+        "tools": ["Read", "Grep", "Glob", "Edit", "Write", "mcp__chrome_devtools__performance_start_trace", "mcp__chrome_devtools__performance_stop_trace"],
+        "human_review_required": true,
+        "description": "Performance analyst that measures and analyzes application performance characteristics"
+      }
+    },
+
+    "ux-researcher": {
+      "id": "agent-007",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/ux-researcher.md",
+      "hash": "stu901vwx234",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["documentation-standards"],
+      "dependencies": ["mcp__playwright__browser_navigate", "mcp__playwright__browser_screenshot"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_UX_RESEARCH",
+        "updates_status_to": "UX_RESEARCH_COMPLETE",
+        "next_agent": "architect-review",
+        "queue_field": "ux_research_path",
+        "output_location": "docs/ux/[slug]-research.md",
+        "tools": ["Read", "Grep", "Glob", "Edit", "Write", "mcp__playwright__browser_navigate", "mcp__playwright__browser_screenshot"],
+        "human_review_required": true,
+        "description": "UX researcher that conducts user research and creates design recommendations"
+      }
+    },
+
+    "code-reviewer": {
+      "id": "agent-008",
+      "type": "agent",
+      "version": "1.0.0",
+      "path": ".claude/modules/agents/code-reviewer.json",
+      "hash": "vwx234yzm567",
+      "parents": ["CLAUDE.md"],
+      "applies_rules": ["naming-conventions", "testing-standards", "security-rules", "code-style"],
+      "dependencies": ["mcp__semgrep__security_check", "mcp__semgrep__semgrep_scan"],
+
+      "agent_metadata": {
+        "triggered_by_status": "READY_FOR_CODE_REVIEW",
+        "updates_status_to": "CODE_REVIEWED",
+        "next_agent": "implementer-tester",
+        "queue_field": "code_review_path",
+        "output_location": "docs/reviews/[slug]-code-review.md",
+        "tools": ["Read", "Grep", "Glob", "Edit", "Write", "mcp__semgrep__security_check", "mcp__semgrep__semgrep_scan"],
+        "human_review_required": true,
+        "description": "Code reviewer that performs security and quality analysis on implementations"
+      }
+    },
+
+    "_comment": "👇 RULES MODULES - CODING STANDARDS AND CONVENTIONS 👇",
+
+    "commenting-best-practices": {
+      "id": "rule-008",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/commenting-best-practices.md",
+      "hash": "rule008hash123",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.py", "*.md"],
+      "description": "Write meaningful, strategic comments that explain 'why' not 'what', avoiding migration history and obvious statements"
+    },
+
+    "no-explicit-any": {
+      "id": "rule-009",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-explicit-any.md",
+      "hash": "rule009hash456",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Prohibit explicit 'any' types in TypeScript to maintain type safety"
+    },
+
+    "nextjs-15-async-params": {
+      "id": "rule-010",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/nextjs-15-async-params.md",
+      "hash": "rule010hash789",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Next.js 15 requires async params and searchParams - they must be awaited before accessing properties"
+    },
+
+    "typescript-explicit-return-types": {
+      "id": "rule-011",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/typescript-explicit-return-types.md",
+      "hash": "rule011hash012",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Require explicit return types for TypeScript functions to improve type safety and code clarity"
+    },
+
+    "no-eslint-disable-comments": {
+      "id": "rule-012",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-eslint-disable-comments.md",
+      "hash": "rule012hash345",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "description": "Never use ESLint disable comments - always fix the root cause instead of bypassing important code quality checks"
+    },
+
+    "prefer-shadcn-components": {
+      "id": "rule-013",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/prefer-shadcn-components.md",
+      "hash": "rule013hash678",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Prefer shadcn/ui components over custom or third-party alternatives for consistency, accessibility, and theming"
+    },
+
+    "no-async-client-components": {
+      "id": "rule-014",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-async-client-components.md",
+      "hash": "rule014hash901",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "No async client components - separate server and client concerns properly in Next.js App Router"
+    },
+
+    "no-inline-styles-use-cn": {
+      "id": "rule-015",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-inline-styles-use-cn.md",
+      "hash": "rule015hash234",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "No inline styles - use cn() utility with conditional Tailwind classes for consistent styling"
+    },
+
+    "nextjs-api-route-data-handling": {
+      "id": "rule-016",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/nextjs-api-route-data-handling.md",
+      "hash": "rule016hash567",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Next.js API routes require explicit JSON parsing and proper request data handling - don't use deprecated body property"
+    },
+
+    "nextjs-redirect-outside-try-catch": {
+      "id": "rule-017",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/nextjs-redirect-outside-try-catch.md",
+      "hash": "rule017hash890",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Next.js redirect() and notFound() must be called outside try-catch blocks - they throw NEXT_REDIRECT errors"
+    },
+
+    "no-ts-expect-error": {
+      "id": "rule-018",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-ts-expect-error.md",
+      "hash": "rule018hash123",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Never use @ts-expect-error comments - fix the underlying type issue instead of suppressing TypeScript errors"
+    },
+
+    "shadcn-component-styling": {
+      "id": "rule-019",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/shadcn-component-styling.md",
+      "hash": "rule019hash456",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Use Class Variance Authority (CVA) for styling shadcn/ui components - enables variant-based styling and proper TypeScript support"
+    },
+
+    "drizzle-orm-type-safe-queries": {
+      "id": "rule-020",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/drizzle-orm-type-safe-queries.md",
+      "hash": "rule020hash789",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Use type-safe Drizzle ORM queries with schema imports and proper TypeScript typing - never use raw SQL or string concatenation"
+    },
+
+    "react-no-jsx-return-types": {
+      "id": "rule-021",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/react-no-jsx-return-types.md",
+      "hash": "rule021hash012",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Never use JSX.Element as return type for React components - use JSX.Element[] or ReactNode for arrays, proper function return types"
+    },
+
+    "drizzle-pgtable-syntax": {
+      "id": "rule-022",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/drizzle-pgtable-syntax.md",
+      "hash": "rule022hash345",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Use proper pgTable syntax with serial primary keys, correct column types, and proper Drizzle ORM schema definition patterns"
+    },
+
+    "escape-apostrophes-quotes": {
+      "id": "rule-023",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/escape-apostrophes-quotes.md",
+      "hash": "rule023hash678",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.json"],
+      "description": "Always escape apostrophes and quotes in strings to prevent syntax errors and injection vulnerabilities"
+    },
+
+    "no-build-commands": {
+      "id": "rule-024",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-build-commands.md",
+      "hash": "rule024hash901",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "description": "Never use build commands in code - use proper deployment pipelines, scripts, and CI/CD workflows instead"
+    },
+
+    "no-eslint-disable-any-rule": {
+      "id": "rule-025",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-eslint-disable-any-rule.md",
+      "hash": "rule025hash234",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "description": "Never disable ESLint rules with eslint-disable comments - fix the underlying issue instead of bypassing code quality checks"
+    },
+
+    "no-eslint-disable-constant-condition": {
+      "id": "rule-026",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-eslint-disable-constant-condition.md",
+      "hash": "rule026hash567",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "description": "Never disable ESLint constant condition rules - fix boolean logic instead of suppressing warnings about always-true/always-false conditions"
+    },
+
+    "no-eslint-disable-unescaped-entities": {
+      "id": "rule-027",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-eslint-disable-unescaped-entities.md",
+      "hash": "rule027hash890",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.jsx", "*.html"],
+      "description": "Never disable ESLint unescaped entity rules - properly escape HTML entities in JSX to prevent XSS vulnerabilities"
+    },
+
+    "no-eslint-disable-exhaustive-deps": {
+      "id": "rule-028",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-eslint-disable-exhaustive-deps.md",
+      "hash": "rule028hash123",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Never disable ESLint exhaustive-deps rule - properly manage React useEffect dependencies instead of ignoring them"
+    },
+
+    "no-toast-in-server-actions": {
+      "id": "rule-029",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-toast-in-server-actions.md",
+      "hash": "rule029hash456",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Never use toast notifications in Server Actions - they run on server and can't access client-side toast APIs"
+    },
+
+    "no-void-unused-variables": {
+      "id": "rule-030",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/no-void-unused-variables.md",
+      "hash": "rule030hash789",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "description": "Never use void to suppress unused variable warnings - fix root causes instead of masking code quality issues"
+    },
+
+    "postgresql-function-parameter-changes": {
+      "id": "rule-031",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/postgresql-function-parameter-changes.md",
+      "hash": "rule031hash012",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.sql", "*.ts"],
+      "description": "PostgreSQL function parameter changes require DROP FUNCTION before CREATE - never use CREATE OR REPLACE for parameter name changes"
+    },
+
+    "prefer-nextjs-image-component": {
+      "id": "rule-032",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/prefer-nextjs-image-component.md",
+      "hash": "rule032hash345",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Use Next.js Image component instead of HTML img tags for automatic optimization, performance benefits, and modern web standards"
+    },
+
+    "separate-server-client-utilities": {
+      "id": "rule-033",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/separate-server-client-utilities.md",
+      "hash": "rule033hash678",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Separate server-side and client-safe utilities to prevent build errors and maintain proper Next.js server/client boundaries"
+    },
+
+    "detect-project-type-for-linting": {
+      "id": "rule-034",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/detect-project-type-for-linting.md",
+      "hash": "rule034hash901",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx", "*.py", "*.js", "*.jsx"],
+      "description": "Detect project types automatically and use appropriate linting commands for Python vs Node.js projects"
+    },
+
+    "use-client-directive-guidelines": {
+      "id": "rule-035",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/use-client-directive-guidelines.md",
+      "hash": "rule035hash234",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Use client directive guidelines - Server vs Client component boundaries in Next.js 13+ App Router"
+    },
+
+    "use-package-json-drizzle-scripts": {
+      "id": "rule-036",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/use-package-json-drizzle-scripts.md",
+      "hash": "rule036hash567",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.ts", "*.tsx"],
+      "description": "Use package.json scripts for Drizzle operations with proper environment variable loading via dotenv-cli"
+    },
+
+    "use-refobject-not-mutablerefobject": {
+      "id": "rule-037",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/use-refobject-not-mutablerefobject.md",
+      "hash": "rule037hash890",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Use RefObject instead of deprecated MutableRefObject for proper null safety and modern React typing"
+    },
+
+    "use-searchparams-requires-suspense": {
+      "id": "rule-038",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/use-searchparams-requires-suspense.md",
+      "hash": "rule038hash123",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.tsx", "*.ts"],
+      "description": "Wrap Client Components using useSearchParams() in Suspense boundaries to prevent build failures"
+    },
+
+    "shadcn-install-components": {
+      "id": "rule-039",
+      "type": "rule",
+      "version": "1.0.0",
+      "path": ".claude/modules/rules/shadcn-install-components.md",
+      "hash": "rule039hash456",
+      "parents": ["CLAUDE.md"],
+      "children": [],
+      "auto_cascade": true,
+      "applies_to": ["*.json", "*.sh", "*.bash"],
+      "description": "Install shadcn components using npx shadcn@latest add for consistent, up-to-date installations"
+    }
+  },
+
+  "agent_workflows": {
+    "_comment": "Define different workflow paths using registered agents",
+
+    "standard_feature": {
+      "name": "Standard Feature Development",
+      "description": "Basic feature development workflow",
+      "steps": [
+        {"agent": "pm-spec", "status_transition": "DRAFT → READY_FOR_ARCH"},
+        {"agent": "architect-review", "status_transition": "READY_FOR_ARCH → READY_FOR_BUILD"},
+        {"agent": "implementer-tester", "status_transition": "READY_FOR_BUILD → DONE"}
+      ]
+    },
+
+    "security_critical": {
+      "name": "Security-Critical Feature",
+      "description": "Enhanced workflow for security-sensitive features",
+      "steps": [
+        {"agent": "pm-spec", "status_transition": "DRAFT → READY_FOR_ARCH"},
+        {"agent": "architect-review", "status_transition": "READY_FOR_ARCH → READY_FOR_SECURITY_AUDIT"},
+        {"agent": "security-auditor", "status_transition": "READY_FOR_SECURITY_AUDIT → SECURITY_APPROVED"},
+        {"agent": "implementer-tester", "status_transition": "SECURITY_APPROVED → DONE"}
+      ]
+    },
+
+    "performance_critical": {
+      "name": "Performance-Critical Feature",
+      "description": "Workflow for performance-sensitive features",
+      "steps": [
+        {"agent": "pm-spec", "status_transition": "DRAFT → READY_FOR_ARCH"},
+        {"agent": "architect-review", "status_transition": "READY_FOR_ARCH → READY_FOR_BUILD"},
+        {"agent": "implementer-tester", "status_transition": "READY_FOR_BUILD → READY_FOR_PERFORMANCE_ANALYSIS"},
+        {"agent": "performance-analyst", "status_transition": "READY_FOR_PERFORMANCE_ANALYSIS → PERFORMANCE_APPROVED"},
+        {"agent": "documentation-writer", "status_transition": "PERFORMANCE_APPROVED → DOCS_COMPLETE"}
+      ]
+    },
+
+    "ux_critical": {
+      "name": "UX-Critical Feature",
+      "description": "Workflow for user experience intensive features",
+      "steps": [
+        {"agent": "ux-researcher", "status_transition": "DRAFT → UX_RESEARCH_COMPLETE"},
+        {"agent": "pm-spec", "status_transition": "UX_RESEARCH_COMPLETE → READY_FOR_ARCH"},
+        {"agent": "architect-review", "status_transition": "READY_FOR_ARCH → READY_FOR_BUILD"},
+        {"agent": "implementer-tester", "status_transition": "READY_FOR_BUILD → DONE"}
+      ]
+    },
+
+    "documentation_only": {
+      "name": "Documentation Update",
+      "description": "Workflow for documentation-only tasks",
+      "steps": [
+        {"agent": "documentation-writer", "status_transition": "READY_FOR_DOCS → DOCS_COMPLETE"}
+      ]
+    },
+
+    "code_review_workflow": {
+      "name": "Code Review Process",
+      "description": "Enhanced code review with security analysis",
+      "steps": [
+        {"agent": "code-reviewer", "status_transition": "READY_FOR_CODE_REVIEW → CODE_REVIEWED"},
+        {"agent": "implementer-tester", "status_transition": "CODE_REVIEWED → DONE"}
+      ]
+    }
+  },
+
+  "status_mappings": {
+    "_comment": "Comprehensive mapping of all status values to agents",
+
+    "DRAFT": {
+      "agent": "pm-spec",
+      "next_status": "READY_FOR_ARCH",
+      "description": "Initial state, needs specification"
+    },
+    "READY_FOR_ARCH": {
+      "agent": "architect-review",
+      "next_status": "READY_FOR_BUILD",
+      "description": "Specification complete, needs architecture"
+    },
+    "READY_FOR_BUILD": {
+      "agent": "implementer-tester",
+      "next_status": "DONE",
+      "description": "Architecture approved, ready for implementation"
+    },
+    "READY_FOR_SECURITY_AUDIT": {
+      "agent": "security-auditor",
+      "next_status": "SECURITY_APPROVED",
+      "description": "Architecture complete, needs security review"
+    },
+    "READY_FOR_DOCS": {
+      "agent": "documentation-writer",
+      "next_status": "DOCS_COMPLETE",
+      "description": "Implementation complete, needs documentation"
+    },
+    "READY_FOR_PERFORMANCE_ANALYSIS": {
+      "agent": "performance-analyst",
+      "next_status": "PERFORMANCE_APPROVED",
+      "description": "Implementation complete, needs performance analysis"
+    },
+    "READY_FOR_UX_RESEARCH": {
+      "agent": "ux-researcher",
+      "next_status": "UX_RESEARCH_COMPLETE",
+      "description": "Initial concept, needs user research"
+    },
+    "READY_FOR_CODE_REVIEW": {
+      "agent": "code-reviewer",
+      "next_status": "CODE_REVIEWED",
+      "description": "Implementation complete, needs code review"
+    },
+    "SECURITY_APPROVED": {
+      "agent": "implementer-tester",
+      "next_status": "DONE",
+      "description": "Security audit complete, ready for implementation"
+    },
+    "PERFORMANCE_APPROVED": {
+      "agent": "documentation-writer",
+      "next_status": "DOCS_COMPLETE",
+      "description": "Performance analysis complete, needs documentation"
+    },
+    "UX_RESEARCH_COMPLETE": {
+      "agent": "pm-spec",
+      "next_status": "READY_FOR_ARCH",
+      "description": "UX research complete, ready for specification"
+    },
+    "CODE_REVIEWED": {
+      "agent": "implementer-tester",
+      "next_status": "DONE",
+      "description": "Code review complete, ready for final implementation"
+    }
+  },
+
+  "registry_metadata": {
+    "total_agents": 8,
+    "total_workflows": 6,
+    "total_rules": 32,
+    "last_agent_added": "code-reviewer",
+    "last_workflow_added": "code_review_workflow",
+    "last_rule_added": "shadcn-install-components",
+    "supported_status_count": 12,
+    "schema_version": "2.0"
+  }
+}

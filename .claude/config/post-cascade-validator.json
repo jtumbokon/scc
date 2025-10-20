@@ -1,0 +1,316 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Post-Cascade Validation System - Ensures cross-file consistency and prevents synchronization failures",
+  "_last_updated": "2025-10-20T22:00:00Z",
+
+  "post_cascade_validator": {
+    "enabled": true,
+    "validation_mode": "comprehensive",
+    "failure_action": "rollback_and_block",
+    "auto_fix_enabled": true,
+
+    "validation_pipeline": [
+      {
+        "stage": "immediate_consistency_check",
+        "description": "Validate consistency immediately after cascade",
+        "timeout": 30,
+        "required": true,
+        "failure_action": "rollback_and_alert"
+      },
+      {
+        "stage": "deep_integrity_validation",
+        "description": "Comprehensive system integrity check",
+        "timeout": 120,
+        "required": true,
+        "failure_action": "rollback_and_alert"
+      },
+      {
+        "stage": "documentation_synchronization",
+        "description": "Ensure all documentation is synchronized",
+        "timeout": 60,
+        "required": true,
+        "failure_action": "auto_fix_and_validate"
+      },
+      {
+        "stage": "final_health_assessment",
+        "description": "Final system health assessment",
+        "timeout": 30,
+        "required": true,
+        "failure_action": "alert_and_monitor"
+      }
+    ],
+
+    "consistency_checks": {
+      "version_consistency": {
+        "enabled": true,
+        "description": "All system files must show the same version",
+        "critical": true,
+        "files": [
+          "version.json:system.version",
+          "CLAUDE.md:line_8",
+          "README.md:line_5",
+          "dependency-graph.json:_schema_version"
+        ],
+        "tolerance": "exact_match",
+        "auto_fix": {
+          "enabled": true,
+          "source_of_truth": "dependency-graph.json",
+          "sync_method": "overwrite_from_source"
+        },
+        "validation_logic": {
+          "extract_version": {
+            "version.json": "system.version",
+            "CLAUDE.md": "regex:\\*\\*Version\\*\\*: ([0-9]+\\.[0-9]+\\.[0-9]+)",
+            "README.md": "regex:version-([0-9]+\\.[0-9]+\\.[0-9]+)",
+            "dependency-graph.json": "_schema_version"
+          },
+          "compare_versions": "all_equal",
+          "fix_versions": "propagate_from_dependency_graph"
+        }
+      },
+
+      "rule_count_consistency": {
+        "enabled": true,
+        "description": "Rule counts must match across all files",
+        "critical": true,
+        "sources": [
+          "dependency-graph.json:modules.rule_count",
+          "CLAUDE.md:rules_list_count",
+          "README.md:rules_statistics"
+        ],
+        "tolerance": "exact_match",
+        "auto_fix": {
+          "enabled": true,
+          "source_of_truth": "dependency-graph.json",
+          "sync_method": "regenerate_from_source"
+        },
+        "validation_logic": {
+          "count_dependency_graph_rules": "filter modules by type=rule",
+          "count_claude_md_rules": "parse rules list in CLAUDE.md",
+          "count_readme_rules": "extract from README.md statistics",
+          "compare_counts": "all_equal",
+          "fix_discrepancies": "regenerate_documentation"
+        }
+      },
+
+      "module_list_consistency": {
+        "enabled": true,
+        "description": "Module lists must be synchronized between files",
+        "critical": true,
+        "files": [
+          "dependency-graph.json:modules",
+          "CLAUDE.md:active_modules"
+        ],
+        "tolerance": "exact_match",
+        "auto_fix": {
+          "enabled": true,
+          "source_of_truth": "dependency-graph.json",
+          "sync_method": "update_from_dependency_graph"
+        }
+      },
+
+      "timestamp_consistency": {
+        "enabled": true,
+        "description": "Timestamps must be chronological and logical",
+        "critical": false,
+        "files": [
+          "version.json:system.last_updated",
+          "dependency-graph.json:_last_updated",
+          "update-log.json:latest_timestamp",
+          "cascade-update-log.json:latest_timestamp"
+        ],
+        "tolerance": "chronological",
+        "auto_fix": {
+          "enabled": true,
+          "source_of_truth": "current_timestamp",
+          "sync_method": "update_to_current"
+        }
+      },
+
+      "file_integrity": {
+        "enabled": true,
+        "description": "All critical files must exist and be valid",
+        "critical": true,
+        "required_files": [
+          "CLAUDE.md",
+          "version.json",
+          "registry/dependency-graph.json",
+          "config/cascade-coordinator.json",
+          "config/validation-rules.json",
+          "README.md"
+        ],
+        "validation": {
+          "file_exists": "check_file_existence",
+          "file_readable": "check_file_permissions",
+          "json_valid": "validate_json_structure",
+          "markdown_valid": "validate_markdown_structure"
+        }
+      }
+    },
+
+    "auto_fix_strategies": {
+      "version_sync": {
+        "trigger": "version_consistency_failure",
+        "actions": [
+          {
+            "step": "extract_source_version",
+            "source": "dependency-graph.json",
+            "field": "_schema_version"
+          },
+          {
+            "step": "update_version_json",
+            "target": "version.json",
+            "field": "system.version"
+          },
+          {
+            "step": "update_claude_md",
+            "target": "CLAUDE.md",
+            "pattern": "\\*\\*Version\\*\\*: [0-9]+\\.[0-9]+\\.[0-9]+",
+            "replacement": "**Version**: {source_version}"
+          },
+          {
+            "step": "update_readme",
+            "target": "README.md",
+            "pattern": "version-[0-9]+\\.[0-9]+\\.[0-9]+",
+            "replacement": "version-{source_version}"
+          }
+        ]
+      },
+
+      "rules_list_sync": {
+        "trigger": "rule_count_consistency_failure",
+        "actions": [
+          {
+            "step": "extract_rules_from_dependency_graph",
+            "source": "dependency-graph.json",
+            "filter": "modules.type=rule"
+          },
+          {
+            "step": "categorize_rules",
+            "method": "by_rule_id_pattern"
+          },
+          {
+            "step": "generate_claude_md_rules_section",
+            "template": "templates/claude-rules-section.template.md"
+          },
+          {
+            "step": "update_claude_md",
+            "target": "CLAUDE.md",
+            "section": "Claude Code Integration Rules"
+          },
+          {
+            "step": "update_readme_statistics",
+            "target": "README.md",
+            "section": "Module Distribution"
+          }
+        ]
+      },
+
+      "module_list_sync": {
+        "trigger": "module_list_consistency_failure",
+        "actions": [
+          {
+            "step": "extract_modules_from_dependency_graph",
+            "source": "dependency-graph.json"
+          },
+          {
+            "step": "categorize_modules",
+            "method": "by_type"
+          },
+          {
+            "step": "generate_active_modules_section",
+            "template": "templates/active-modules.template.md"
+          },
+          {
+            "step": "update_claude_md",
+            "target": "CLAUDE.md",
+            "section": "Active Modules"
+          }
+        ]
+      },
+
+      "file_integrity_fix": {
+        "trigger": "file_integrity_failure",
+        "actions": [
+          {
+            "step": "identify_missing_files",
+            "method": "compare_required_vs_existing"
+          },
+          {
+            "step": "create_missing_file",
+            "method": "from_template_or_default"
+          },
+          {
+            "step": "validate_file_permissions",
+            "method": "set_standard_permissions"
+          },
+          {
+            "step": "validate_file_structure",
+            "method": "schema_validation"
+          }
+        ]
+      }
+    },
+
+    "validation_reporting": {
+      "enabled": true,
+      "report_format": "structured",
+      "log_file": "registry/post-cascade-validation.log",
+      "include_sections": [
+        "validation_summary",
+        "consistency_check_results",
+        "auto_fix_actions_taken",
+        "final_system_state",
+        "recommendations"
+      ]
+    },
+
+    "monitoring_and_alerts": {
+      "enabled": true,
+      "metrics": [
+        "validation_success_rate",
+        "auto_fix_success_rate",
+        "consistency_score",
+        "validation_duration"
+      ],
+      "alerts": {
+        "validation_failure": {
+          "enabled": true,
+          "threshold": "any_failure",
+          "action": "immediate_rollback"
+        },
+        "auto_fix_failure": {
+          "enabled": true,
+          "threshold": "any_failure",
+          "action": "manual_intervention_required"
+        },
+        "consistency_score_drop": {
+          "enabled": true,
+          "threshold": 95,
+          "action": "deep_analysis_trigger"
+        }
+      }
+    },
+
+    "testing_framework": {
+      "enabled": true,
+      "test_scenarios": [
+        {
+          "name": "version_consistency_test",
+          "description": "Test version synchronization across files",
+          "test_method": "modify_versions_and_validate_sync"
+        },
+        {
+          "name": "rules_list_consistency_test",
+          "description": "Test rules list synchronization",
+          "test_method": "add_rules_and_validate_documentation"
+        },
+        {
+          "name": "atomic_cascade_test",
+          "description": "Test atomic all-or-none updates",
+          "test_method": "simulate_failure_and_validate_rollback"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+[
+  {
+    "slug": "user-authentication",
+    "title": "Implement user authentication system",
+    "status": "READY_FOR_ARCH",
+    "created": "2025-10-19T18:00:00Z",
+    "updated": "2025-10-19T18:30:00Z",
+    "assigned_agent": "pm-spec",
+    "spec_path": "docs/claude/working-notes/user-authentication.md",
+    "priority": 8,
+    "tags": ["security", "core-feature"],
+    "estimated_hours": 16,
+    "notes": [
+      "Include OAuth and JWT options",
+      "Consider MFA requirements"
+    ]
+  },
+  {
+    "slug": "payment-integration",
+    "title": "Integrate Stripe payment processing",
+    "status": "READY_FOR_BUILD",
+    "created": "2025-10-18T14:00:00Z",
+    "updated": "2025-10-19T16:00:00Z",
+    "assigned_agent": "architect-review",
+    "spec_path": "docs/claude/working-notes/payment-integration.md",
+    "adr_path": "docs/claude/decisions/ADR-payment-integration.md",
+    "priority": 9,
+    "tags": ["payments", "integration"],
+    "estimated_hours": 24,
+    "notes": [
+      "PCI compliance required",
+      "Webhook handling needed"
+    ]
+  },
+  {
+    "slug": "dashboard-redesign",
+    "title": "Redesign user dashboard UI",
+    "status": "DONE",
+    "created": "2025-10-15T10:00:00Z",
+    "updated": "2025-10-19T17:00:00Z",
+    "assigned_agent": "implementer-tester",
+    "spec_path": "docs/claude/working-notes/dashboard-redesign.md",
+    "adr_path": "docs/claude/decisions/ADR-dashboard-redesign.md",
+    "pr_url": "https://github.com/org/repo/pull/123",
+    "priority": 6,
+    "tags": ["ui", "ux"],
+    "estimated_hours": 12,
+    "actual_hours": 14,
+    "notes": [
+      "Completed with responsive design",
+      "User testing feedback incorporated"
+    ]
+  },
+  {
+    "slug": "api-performance-optimization",
+    "title": "Optimize API response times",
+    "status": "NEEDS_REVIEW",
+    "created": "2025-10-17T09:00:00Z",
+    "updated": "2025-10-19T15:30:00Z",
+    "assigned_agent": "implementer-tester",
+    "priority": 7,
+    "tags": ["performance", "api"],
+    "estimated_hours": 8,
+    "actual_hours": 10,
+    "notes": [
+      "Caching implemented",
+      "Database queries optimized",
+      "Ready for performance review"
+    ]
+  }
+]

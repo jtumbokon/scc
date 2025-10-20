@@ -1,0 +1,79 @@
+{
+  "cascade_rules": {
+    "automatic": {
+      "rules": ["*"],
+      "description": "Rules automatically cascade to all dependent modules",
+      "conditions": {
+        "version_compatible": true,
+        "no_circular_dependencies": true,
+        "validation_passed": true
+      },
+      "actions": ["update_version", "update_dependencies", "log_changes"]
+    },
+    "conditional": {
+      "templates": ["*"],
+      "description": "Templates cascade conditionally based on compatibility",
+      "conditions": {
+        "version_compatible": true,
+        "template_compatible": true,
+        "no_breaking_changes": true
+      },
+      "actions": ["update_version", "update_dependencies", "validate_template", "log_changes"]
+    },
+    "manual": {
+      "agents": ["*"],
+      "description": "Agents require manual cascade confirmation",
+      "conditions": {
+        "manual_confirmation": true,
+        "agent_compatible": true
+      },
+      "actions": ["request_confirmation", "update_version", "log_changes"]
+    }
+  },
+  "version_rules": {
+    "semantic_versioning": true,
+    "auto_increment": {
+      "patch": ["content_fix", "typo_fix", "documentation_update"],
+      "minor": ["feature_addition", "template_update", "enhancement"],
+      "major": ["breaking_change", "architecture_change", "api_change"]
+    }
+  },
+  "dependency_resolution": {
+    "topological_sort": true,
+    "conflict_detection": true,
+    "auto_resolution": {
+      "enabled": true,
+      "strategies": ["latest_compatible", "minimize_breaking_changes"]
+    }
+  },
+  "validation_triggers": {
+    "before_cascade": [
+      "check_circular_dependencies",
+      "validate_version_compatibility",
+      "verify_integrity"
+    ],
+    "after_cascade": [
+      "update_dependency_graph",
+      "validate_system_integrity",
+      "log_changes"
+    ]
+  },
+  "error_handling": {
+    "cascade_failure": {
+      "rollback": true,
+      "notification": true,
+      "fallback_strategy": "previous_stable_version"
+    },
+    "validation_failure": {
+      "block_cascade": true,
+      "report_errors": true,
+      "require_manual_resolution": true
+    }
+  },
+  "performance": {
+    "parallel_cascade": true,
+    "batch_size": 10,
+    "timeout_seconds": 300,
+    "cache_dependencies": true
+  }
+}
